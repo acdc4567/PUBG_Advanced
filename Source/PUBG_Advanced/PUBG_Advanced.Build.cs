@@ -17,7 +17,8 @@ public class PUBG_Advanced : ModuleRules
         "PUBG_Advanced/Public/UI",
         "PUBG_Advanced/Public/PlayerState",
         "PUBG_Advanced/Public/Player",
-        "PUBG_Advanced/Public/Animation"
+        "PUBG_Advanced/Public/Animation",
+        "PUBG_Advanced/Public/Animation/Notifies"
         });
 	
 	}

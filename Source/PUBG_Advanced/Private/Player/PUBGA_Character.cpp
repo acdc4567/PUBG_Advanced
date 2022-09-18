@@ -2,12 +2,27 @@
 
 
 #include "Player/PUBGA_Character.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
+
+
 
 // Sets default values
 APUBGA_Character::APUBGA_Character()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	
+	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("CameraBoom");
+	CameraBoom->SetupAttachment(GetRootComponent());
+
+	FollowCamera = CreateDefaultSubobject<UCameraComponent>("FollowCamera");
+	FollowCamera->SetupAttachment(CameraBoom);
+
+
+
+
+
 
 }
 
