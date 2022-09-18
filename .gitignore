@@ -13,6 +13,23 @@ Saved
 *.xcodeproj
 *.xcworkspace
 
-Content/Assets/*
+
 Content/Maps/*
+
+Content/Assets/Audio
+Content/Assets/Font
+Content/Assets/Humans
+Content/Assets/Icons
+Content/Assets/Maps
+Content/Assets/Others
+Content/Assets/Outline
+Content/Assets/Parachute
+Content/Assets/Particles
+Content/Assets/Prop
+Content/Assets/SafeZone
+Content/Assets/UI
+Content/Assets/Vehicle
+Content/Assets/Weapons
+
+
 
