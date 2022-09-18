@@ -13,7 +13,10 @@ public class PUBG_Advanced : ModuleRules
 		PublicIncludePaths.AddRange(new string[] { 
 		"PUBG_Advanced/Public/GameMode",
         "PUBG_Advanced/Public/PlayerController",
-        "PUBG_Advanced/Public/GameState"
+        "PUBG_Advanced/Public/GameState",
+        "PUBG_Advanced/Public/UI",
+        "PUBG_Advanced/Public/PlayerState",
+        "PUBG_Advanced/Public/Player"
         });
 	
 	}

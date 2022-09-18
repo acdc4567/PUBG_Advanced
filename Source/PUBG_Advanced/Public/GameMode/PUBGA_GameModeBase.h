@@ -13,5 +13,8 @@ UCLASS()
 class PUBG_ADVANCED_API APUBGA_GameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+public:
+	APUBGA_GameModeBase();
+
+
 };
