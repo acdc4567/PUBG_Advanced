@@ -4,6 +4,8 @@
 #include "Player/PUBGA_Character.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "PlayerController/PUBGA_PlayerController.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 
@@ -19,7 +21,7 @@ APUBGA_Character::APUBGA_Character()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>("FollowCamera");
 	FollowCamera->SetupAttachment(CameraBoom);
 
-
+	GetCharacterMovement()->bUseSeparateBrakingFriction = 1;
 
 
 
@@ -33,6 +35,20 @@ void APUBGA_Character::BeginPlay()
 	
 }
 
+void APUBGA_Character::MouseTurn(float AxisValue) {
+
+	AddControllerYawInput(AxisValue*.7f);
+
+}
+
+void APUBGA_Character::MouseLookUp(float AxisValue) {
+
+	AddControllerPitchInput(AxisValue * .7f);
+
+}
+
+
+
 // Called every frame
 void APUBGA_Character::Tick(float DeltaTime)
 {
@@ -45,5 +61,15 @@ void APUBGA_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void APUBGA_Character::PossessedBy(AController* inController) {
+
+	APUBGA_PlayerController* SPC = Cast<APUBGA_PlayerController>(inController);
+	if (SPC) {
+		MyPlayerControllerRef = SPC;
+		SPC->OnPossessx1(this);
+
+	}
 }
 

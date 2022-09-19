@@ -8,7 +8,7 @@
 
 class USpringArmComponent;
 class UCameraComponent;
-
+class APUBGA_PlayerController;
 
 
 
@@ -70,8 +70,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Animation)
 		bool bIsPlayingMontage = 0;
 
+	
 
-
+	UPROPERTY()
+		APUBGA_PlayerController* MyPlayerControllerRef;
 
 
 
@@ -98,12 +100,16 @@ public:
 	
 	FORCEINLINE float GetForwardValue() const { return ForwardValue; }
 
+	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
 
+	virtual void PossessedBy(AController* inController) override;
 
+	UFUNCTION(Category = MouseInput)
+		void MouseTurn(float AxisValue);
 
+	UFUNCTION(Category = MouseInput)
+		void MouseLookUp(float AxisValue);
 
-
-
-
+	
 };
