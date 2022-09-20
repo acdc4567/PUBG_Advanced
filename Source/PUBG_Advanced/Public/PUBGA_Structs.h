@@ -187,5 +187,74 @@ struct FSTR_ItemWeapon : public FTableRowBase {
 };
 
 
+USTRUCT(BlueprintType)
+struct FSTR_ItemAmmo : public FTableRowBase {
+	GENERATED_BODY()
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FName Name;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UStaticMesh* PickupMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 PickupAmount;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UTexture2D* Icon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 Weight;
+
+
+};
+
+USTRUCT(BlueprintType)
+struct FSTR_ItemWeaponAcc : public FTableRowBase {
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FName Name;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		EWeaponAccType Type;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TArray<FName> WeaponIDs;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 Weight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UStaticMesh* StaticMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UStaticMesh* StaticMesh2;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UTexture2D* Icon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 SightMultiple;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool bIsSuppressor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool bIsNotFlash;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float ClipRate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 ClipCapacity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float VerticalAdjPer;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float HorizontalAdjPer;
+
+
+};
 
