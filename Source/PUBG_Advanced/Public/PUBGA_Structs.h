@@ -24,6 +24,19 @@ struct FSTR_CameraHeight : public FTableRowBase {
 
 };
 
+USTRUCT(BlueprintType)
+struct FSTR_WalkSpeed : public FTableRowBase {
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float Forward;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float Other;
+
+};
+
+
 
 
 

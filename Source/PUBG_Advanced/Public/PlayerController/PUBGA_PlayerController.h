@@ -165,4 +165,28 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = Cameras)
 		void UpdateCurrentHeight(float UpdatedHeight);
 
+	void WalkKeyPressed();
+	void WalkKeyReleased();
+
+	void RunKeyPressed();
+	void RunKeyReleased();
+
+	void UpdateWalkSpeed();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Input)
+		bool bWalkPressed=0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Input)
+		bool bRunPressed = 0;
+
+	void ReturnThreeIntegers(int32& HoldWeapon, int32& Posture, int32& MoveState);
+
+	FString WalkSpeedTablePath;
+
+	UDataTable* WalkSpeedTableObject;
+
+
+
+
+
 };

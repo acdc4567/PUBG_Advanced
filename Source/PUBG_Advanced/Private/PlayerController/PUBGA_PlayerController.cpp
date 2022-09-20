@@ -15,6 +15,11 @@ APUBGA_PlayerController::APUBGA_PlayerController() {
 	CameraHeightTablePath = TEXT("DataTable'/Game/_Blueprints/Datas/DT_CameraHeight.DT_CameraHeight'");
 	CameraHeightTableObject = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *CameraHeightTablePath));
 
+	WalkSpeedTablePath = TEXT("DataTable'/Game/_Blueprints/Datas/DT_WalkSpeed.DT_WalkSpeed'");
+	WalkSpeedTableObject = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *WalkSpeedTablePath));
+
+
+
 }
 
 void APUBGA_PlayerController::OnPossessx1(APUBGA_Character* inCharacter) {
@@ -42,6 +47,11 @@ void APUBGA_PlayerController::SetupInputComponent() {
 
 	InputComponent->BindAction("Jump", IE_Pressed, this, &APUBGA_PlayerController::JumpKeyPressed);
 
+	InputComponent->BindAction("Walk", IE_Pressed, this, &APUBGA_PlayerController::WalkKeyPressed);
+	InputComponent->BindAction("Walk", IE_Released, this, &APUBGA_PlayerController::WalkKeyReleased);
+
+	InputComponent->BindAction("LeftShift", IE_Pressed, this, &APUBGA_PlayerController::RunKeyPressed);
+	InputComponent->BindAction("LeftShift", IE_Released, this, &APUBGA_PlayerController::RunKeyReleased);
 
 
 
@@ -109,6 +119,7 @@ void APUBGA_PlayerController::MoveFwd(float AxisValue) {
 	}
 
 	if (bEnableMove) {
+		UpdateWalkSpeed();
 		MovingOnTheGround(1, AxisValue, GetControllerRotation());
 	}
 	
@@ -122,6 +133,7 @@ void APUBGA_PlayerController::MoveRt(float AxisValue) {
 	}
 
 	if (bEnableMove) {
+		UpdateWalkSpeed();
 		MovingOnTheGround(0, AxisValue, GetControllerRotation());
 	}
 
@@ -411,13 +423,177 @@ void APUBGA_PlayerController::UpdateCameraHeight() {
 	
 
 
+}
+
+void APUBGA_PlayerController::UpdateCurrentHeight(float UpdatedHeight) {
+	CurrentHeight = UpdatedHeight;
+}
+
+void APUBGA_PlayerController::WalkKeyPressed() {
+
+	bWalkPressed = 1;
+
+}
+
+void APUBGA_PlayerController::WalkKeyReleased() {
+	bWalkPressed = 0;
+
+}
+
+void APUBGA_PlayerController::RunKeyPressed() {
+
+	bRunPressed = 1;
+}
+
+void APUBGA_PlayerController::RunKeyReleased() {
+
+	bRunPressed = 0;
+}
+
+void APUBGA_PlayerController::UpdateWalkSpeed() {
+
+	int32 HoldWeaponx, Posturex, MoveStatex;
+
+	ReturnThreeIntegers(HoldWeaponx, Posturex, MoveStatex);
+	FSTR_WalkSpeed* WalkSpeedRow = nullptr;
+
+	//UE_LOG(LogTemp, Warning, TEXT("% d, % d, % d"), HoldWeaponx, Posturex, MoveStatex);
+	
+	/*
+	false,true
+	stand,crouch,prone
+	walk,jog,run,aim
+	*/
+
+	if (HoldWeaponx == 0 && Posturex == 1 && MoveStatex == 1) {
+		WalkSpeedRow = WalkSpeedTableObject->FindRow<FSTR_WalkSpeed>(FName("false_stand_walk"), TEXT(""));
+		
+	}
+	else if(HoldWeaponx == 0 && Posturex == 1 && MoveStatex == 2) {
+		WalkSpeedRow = WalkSpeedTableObject->FindRow<FSTR_WalkSpeed>(FName("false_stand_jog"), TEXT(""));
+
+	}
+	else if (HoldWeaponx == 0 && Posturex == 1 && MoveStatex == 3) {
+		WalkSpeedRow = WalkSpeedTableObject->FindRow<FSTR_WalkSpeed>(FName("false_stand_run"), TEXT(""));
+
+	}
+	else if (HoldWeaponx == 1 && Posturex == 1 && MoveStatex == 1) {
+		WalkSpeedRow = WalkSpeedTableObject->FindRow<FSTR_WalkSpeed>(FName("true_stand_walk"), TEXT(""));
+
+	}
+	else if (HoldWeaponx == 1 && Posturex == 1 && MoveStatex == 2) {
+		WalkSpeedRow = WalkSpeedTableObject->FindRow<FSTR_WalkSpeed>(FName("true_stand_jog"), TEXT(""));
+
+	}
+	else if (HoldWeaponx == 1 && Posturex == 1 && MoveStatex == 3) {
+		WalkSpeedRow = WalkSpeedTableObject->FindRow<FSTR_WalkSpeed>(FName("true_stand_run"), TEXT(""));
+
+	}
+	else if (HoldWeaponx == 1 && Posturex == 1 && MoveStatex == 4) {
+		WalkSpeedRow = WalkSpeedTableObject->FindRow<FSTR_WalkSpeed>(FName("true_stand_aim"), TEXT(""));
+
+	}
+	else if (HoldWeaponx == 0 && Posturex == 2 && MoveStatex == 1) {
+		WalkSpeedRow = WalkSpeedTableObject->FindRow<FSTR_WalkSpeed>(FName("false_crouch_walk"), TEXT(""));
+
+	}
+	else if (HoldWeaponx == 0 && Posturex == 2 && MoveStatex == 2) {
+		WalkSpeedRow = WalkSpeedTableObject->FindRow<FSTR_WalkSpeed>(FName("false_crouch_jog"), TEXT(""));
+
+	}
+	else if (HoldWeaponx == 0 && Posturex == 2 && MoveStatex == 3) {
+		WalkSpeedRow = WalkSpeedTableObject->FindRow<FSTR_WalkSpeed>(FName("false_crouch_run"), TEXT(""));
+
+	}
+	else if (HoldWeaponx == 1 && Posturex == 2 && MoveStatex == 1) {
+		WalkSpeedRow = WalkSpeedTableObject->FindRow<FSTR_WalkSpeed>(FName("true_crouch_walk"), TEXT(""));
+
+	}
+	else if (HoldWeaponx == 1 && Posturex == 2 && MoveStatex == 2) {
+		WalkSpeedRow = WalkSpeedTableObject->FindRow<FSTR_WalkSpeed>(FName("true_crouch_jog"), TEXT(""));
+
+	}
+	else if (HoldWeaponx == 1 && Posturex == 2 && MoveStatex == 3) {
+		WalkSpeedRow = WalkSpeedTableObject->FindRow<FSTR_WalkSpeed>(FName("true_crouch_run"), TEXT(""));
+
+	}
+	else if (HoldWeaponx == 1 && Posturex == 2 && MoveStatex == 4) {
+		WalkSpeedRow = WalkSpeedTableObject->FindRow<FSTR_WalkSpeed>(FName("true_crouch_aim"), TEXT(""));
+
+	}
+	else if (HoldWeaponx == 0 && Posturex == 3 && MoveStatex == 1) {
+		WalkSpeedRow = WalkSpeedTableObject->FindRow<FSTR_WalkSpeed>(FName("false_prone_walk"), TEXT(""));
+
+	}
+	else if (HoldWeaponx == 0 && Posturex == 3 && MoveStatex == 2) {
+		WalkSpeedRow = WalkSpeedTableObject->FindRow<FSTR_WalkSpeed>(FName("false_prone_jog"), TEXT(""));
+
+	}
+	else if (HoldWeaponx == 0 && Posturex == 3 && MoveStatex == 3) {
+		WalkSpeedRow = WalkSpeedTableObject->FindRow<FSTR_WalkSpeed>(FName("false_prone_run"), TEXT(""));
+
+	}
+	else if (HoldWeaponx == 1 && Posturex == 3 && MoveStatex == 1) {
+		WalkSpeedRow = WalkSpeedTableObject->FindRow<FSTR_WalkSpeed>(FName("true_prone_walk"), TEXT(""));
+
+	}
+	else if (HoldWeaponx == 1 && Posturex == 3 && MoveStatex == 2) {
+		WalkSpeedRow = WalkSpeedTableObject->FindRow<FSTR_WalkSpeed>(FName("true_prone_jog"), TEXT(""));
+
+	}
+	else if (HoldWeaponx == 1 && Posturex == 3 && MoveStatex == 3) {
+		WalkSpeedRow = WalkSpeedTableObject->FindRow<FSTR_WalkSpeed>(FName("true_prone_run"), TEXT(""));
+
+	}
+
+	if (WalkSpeedRow) {
+		if (MoveForwardAxis>0.f) {
+			WalkSpeed = WalkSpeedRow->Forward;
+		}
+		else {
+			WalkSpeed = WalkSpeedRow->Other;
+		}
+	}
+
+
 
 
 
 }
 
-void APUBGA_PlayerController::UpdateCurrentHeight(float UpdatedHeight) {
-	CurrentHeight = UpdatedHeight;
+void APUBGA_PlayerController::ReturnThreeIntegers(int32& HoldWeapon, int32& Posture, int32& MoveState) {
+	if (MyCharacterRef->GetIsHoldWeapon()) {
+		HoldWeapon = 1;
+	}
+	else if(!MyCharacterRef->GetIsHoldWeapon()) {
+		HoldWeapon = 0;
+	}
+	if (MyCharacterRef->GetIsCrouching()) {
+		Posture = 2;
+	}
+	else if(MyCharacterRef->GetIsProne()) {
+		Posture = 3;
+	}
+	else if(!MyCharacterRef->GetIsProne()&&!MyCharacterRef->GetIsCrouching()) {
+		Posture = 1;
+	}
+	if (MyCharacterRef->GetIsAiming()) {
+		MoveState = 4;
+	}
+	else if(!MyCharacterRef->GetIsAiming()&&bWalkPressed) {
+		MoveState = 1;
+	}
+	else if (!MyCharacterRef->GetIsAiming() && bRunPressed) {
+		MoveState = 3;
+	}
+	else if(!MyCharacterRef->GetIsAiming() && !bRunPressed&&!bWalkPressed) {
+		MoveState = 2;
+	}
+
+
+
+
+
 }
 
 
