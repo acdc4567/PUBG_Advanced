@@ -4,13 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "PUBGA_Enums.h"
+#include "Engine/DataTable.h"
 #include "PUBGA_Character.generated.h"
 
 class USpringArmComponent;
 class UCameraComponent;
 class APUBGA_PlayerController;
-
-
+class USkeletalMeshComponent;
+class UMaterialInterface;
+class UMaterialInstanceDynamic;
+class UTexture;
 
 UCLASS()
 class PUBG_ADVANCED_API APUBGA_Character : public ACharacter
@@ -64,10 +68,48 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Animation)
 		bool bIsPlayingMontage = 0;
 
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Meshes)
+		USkeletalMeshComponent* SKM_Hair;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Meshes)
+		USkeletalMeshComponent* SKM_UnderwearTop;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Meshes)
+		USkeletalMeshComponent* SKM_UnderwearBottom;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Meshes)
+		USkeletalMeshComponent* SKM_ClothTop;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Meshes)
+		USkeletalMeshComponent* SKM_ClothBottom;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Meshes)
+		USkeletalMeshComponent* SKM_Whole;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Meshes)
+		USkeletalMeshComponent* SKM_Shoes;
+
+
+
 
 	UPROPERTY()
 		APUBGA_PlayerController* MyPlayerControllerRef;
+
+	UFUNCTION(BlueprintCallable,Category=SkeletalMeshes)
+	void InitSkeletalMesh();
+
+	UFUNCTION(BlueprintCallable,Category=SkeletalMeshes)
+	void ReplaceSkeletalMesh(EFashionType FashionType,FName Namex);
+
+	USkeletalMesh* GetFashionDatas(FName ID);
+
+	UTexture* GetFashionDatasTexture(FName ID);
+
+
+	FString ItemFashionTablePath;
+
+	UDataTable* ItemFashionTableObject;
+
+	UMaterialInstanceDynamic* SkinMatRef;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Meshes)
+		UTexture* SkinMatTest;
+
+
 
 private:
 

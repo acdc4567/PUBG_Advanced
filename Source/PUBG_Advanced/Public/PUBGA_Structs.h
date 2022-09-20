@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/DataTable.h"
+#include "PUBGA_Enums.h"
 #include "PUBGA_Structs.generated.h"
 
 
@@ -36,6 +37,154 @@ struct FSTR_WalkSpeed : public FTableRowBase {
 
 };
 
+
+
+USTRUCT(BlueprintType)
+struct FSTR_ItemFashion : public FTableRowBase {
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		EFashionType Type;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FName Name;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UTexture2D* Icon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		USkeletalMesh* SkeletalMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UStaticMesh* StaticMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UTexture* MaskTexture;
+
+
+};
+
+USTRUCT(BlueprintType)
+struct FSTR_ItemWeapon : public FTableRowBase {
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FName Name;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UTexture2D* Icon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UTexture2D* BigIcon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UTexture2D* Thumbnail;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FName UseAmmoID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 ClipSize;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 Damage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float FiringInterval;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float ReplaceClipTime;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float ReplaceBulletTime;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool bAutoMode;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UStaticMesh* StaticMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		USkeletalMesh* SkeletalMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UStaticMesh* DefaultMag;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UStaticMesh* DefaultSight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UStaticMesh* DefaultButtstock;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		USoundBase* FireSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		USoundBase* FireSoundSuppressor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool bCanSight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool bCanMuzzle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool bCanClip;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool bCanButtStock;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool bCanGrip;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float CrossOffset_Min_Stillness;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float CrossOffset_Max_Stillness;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float CrossOffset_Min_Move;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float CrossOffset_Max_Move;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float CrossOffset_Min_AimStillness;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float CrossOffset_Max_AimStillness;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float CrossOffset_Min_AimMove;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float CrossOffset_Max_AimMove;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float VerticalOffset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float HorizontalOffset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float InitVelocity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float f100MVelocity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float f300MVelocity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float f500MVelocity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float WalkSpeedPer;
+
+
+
+};
 
 
 
