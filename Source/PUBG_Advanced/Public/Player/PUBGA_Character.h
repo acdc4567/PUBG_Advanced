@@ -31,11 +31,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Components)
 		USpringArmComponent* CameraBoom;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = CharacterPose)
-		bool bIsCrouching=0;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = CharacterPose)
-		bool bIsProne = 0;
+	
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = CharacterState)
 		bool bIsDead = 0;
@@ -43,9 +39,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = CharacterState)
 		bool bIsHoldWeapon = 0;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = CharacterState)
-		bool bIsAiming = 0;
-
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = CharacterState)
 		bool bIsFiring = 0;
 
@@ -75,6 +69,16 @@ protected:
 	UPROPERTY()
 		APUBGA_PlayerController* MyPlayerControllerRef;
 
+private:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = CharacterPose, meta = (AllowPrivateAccess = "true"))
+		bool bIsCrouching = 0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = CharacterState, meta = (AllowPrivateAccess = "true"))
+		bool bIsProne = 0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = CharacterState, meta = (AllowPrivateAccess = "true"))
+		bool bIsAiming = 0;
 
 
 
@@ -85,8 +89,10 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+
+	//Getters
 	FORCEINLINE bool GetIsCrouching() const { return bIsCrouching; }
-	FORCEINLINE bool GetIsProne() const { return bIsCrouching; }
+	FORCEINLINE bool GetIsProne() const { return bIsProne; }
 	FORCEINLINE bool GetIsDead() const { return bIsDead; }
 	FORCEINLINE bool GetIsHoldWeapon() const { return bIsHoldWeapon; }
 	FORCEINLINE bool GetIsAiming() const { return bIsAiming; }
@@ -101,6 +107,11 @@ public:
 	FORCEINLINE float GetForwardValue() const { return ForwardValue; }
 
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+
+	//Setters
+	void SetIsProne(const bool& Valuex);
+	void SetIsCrouching(const bool& Valuex);
+	void SetIsAiming(const bool& Valuex);
 
 
 	virtual void PossessedBy(AController* inController) override;

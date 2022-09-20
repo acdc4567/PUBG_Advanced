@@ -37,13 +37,13 @@ void APUBGA_Character::BeginPlay()
 
 void APUBGA_Character::MouseTurn(float AxisValue) {
 
-	AddControllerYawInput(AxisValue*.7f);
+	AddControllerYawInput(AxisValue*.5f);
 
 }
 
 void APUBGA_Character::MouseLookUp(float AxisValue) {
 
-	AddControllerPitchInput(AxisValue * .7f);
+	AddControllerPitchInput(AxisValue*.5f);
 
 }
 
@@ -73,3 +73,13 @@ void APUBGA_Character::PossessedBy(AController* inController) {
 	}
 }
 
+void APUBGA_Character::SetIsProne(const bool& Value) {
+	bIsProne = Value;
+}
+
+void APUBGA_Character::SetIsCrouching(const bool& Value){
+	bIsCrouching = Value;
+}
+void APUBGA_Character::SetIsAiming(const bool& Value){
+	bIsAiming = Value;
+}
