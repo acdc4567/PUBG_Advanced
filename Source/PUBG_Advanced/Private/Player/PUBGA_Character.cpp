@@ -11,6 +11,7 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "PUBGA_Structs.h"
 #include "Engine/Texture.h"
+#include "Items/PickUpBase.h"
 
 
 
@@ -54,6 +55,8 @@ APUBGA_Character::APUBGA_Character()
 	ItemFashionTableObject = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *ItemFashionTablePath));
 
 
+	
+
 }
 
 // Called when the game starts or when spawned
@@ -61,7 +64,9 @@ void APUBGA_Character::BeginPlay()
 {
 	Super::BeginPlay();
 	
+
 }
+
 
 void APUBGA_Character::MouseTurn(float AxisValue) {
 
@@ -74,7 +79,6 @@ void APUBGA_Character::MouseLookUp(float AxisValue) {
 	AddControllerPitchInput(AxisValue*.5f);
 
 }
-
 
 
 // Called every frame

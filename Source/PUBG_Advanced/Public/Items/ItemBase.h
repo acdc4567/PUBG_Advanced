@@ -34,11 +34,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Publics, meta = (ExposeOnSpawn = "true"))
 		int32 Amount;
 
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Publics)
 		USceneComponent* Scene;
 
@@ -47,6 +42,17 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Publics)
 		FName Name;
+
+
+
+
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+	
+	
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
 		APUBGA_Character* CharacterRef;

@@ -15,6 +15,9 @@ class USkeletalMeshComponent;
 class UMaterialInterface;
 class UMaterialInstanceDynamic;
 class UTexture;
+class APickUpBase;
+
+
 
 UCLASS()
 class PUBG_ADVANCED_API APUBGA_Character : public ACharacter
@@ -109,7 +112,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Meshes)
 		UTexture* SkinMatTest;
 
-
+	
+	
 
 private:
 
@@ -165,4 +169,7 @@ public:
 		void MouseLookUp(float AxisValue);
 
 	
+
+
+
 };

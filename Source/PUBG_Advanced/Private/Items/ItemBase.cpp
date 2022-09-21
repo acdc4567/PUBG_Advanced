@@ -17,11 +17,7 @@ AItemBase::AItemBase()
 	Scene = CreateDefaultSubobject<USceneComponent>("Scene");
 	SetRootComponent(Scene);
 
-
-
-
-
-
+	
 
 }
 
