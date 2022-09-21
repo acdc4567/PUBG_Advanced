@@ -67,7 +67,7 @@ void APickUpBase::LineTraceToLands() {
 	FHitResult HitResult;
 	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility, CollisionParams);
 	if (HitResult.bBlockingHit) {
-		SetActorLocation(HitResult.Location+FVector(0.f,0.f,10.f));
+		SetActorLocation(HitResult.Location+FVector(0.f,0.f,15.f));
 	}
 	
 
