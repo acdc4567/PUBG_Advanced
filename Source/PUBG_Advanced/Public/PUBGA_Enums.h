@@ -22,3 +22,19 @@ enum class EWeaponAccType : uint8 {
 	EWAT_MAX UMETA(DisplayName = "DefaultMAX")
 };
 
+UENUM(BlueprintType)
+enum class EItemType : uint8 {
+	EIT_Weapon UMETA(DisplayName = "Weapon"),
+	EIT_Accessories UMETA(DisplayName = "Accessories"),
+	EIT_Ammo UMETA(DisplayName = "Ammo"),
+	EIT_Health UMETA(DisplayName = "Health"),
+	EIT_Boost UMETA(DisplayName = "Boost"),
+	EIT_Helmet UMETA(DisplayName = "Helmet"),
+	EIT_Vest UMETA(DisplayName = "Vest"),
+	EIT_Backpack UMETA(DisplayName = "Backpack"),
+	EIT_Fashion UMETA(DisplayName = "Fashion"),
+	
+	EIT_MAX UMETA(DisplayName = "DefaultMAX")
+};
+
+

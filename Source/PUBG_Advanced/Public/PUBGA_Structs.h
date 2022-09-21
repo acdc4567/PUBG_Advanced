@@ -258,3 +258,95 @@ struct FSTR_ItemWeaponAcc : public FTableRowBase {
 
 };
 
+USTRUCT(BlueprintType)
+struct FSTR_ItemEquipment : public FTableRowBase {
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FName Name;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		EItemType Type;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UStaticMesh* StaticMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UTexture2D* Icon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UTexture2D* Thumbnail;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 Capacity;
+
+
+	
+
+};
+
+
+USTRUCT(BlueprintType)
+struct FSTR_ItemHealth : public FTableRowBase {
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FName Name;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UStaticMesh* StaticMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UTexture2D* Icon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 Weight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float UseTime;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float Value;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float Limit;
+
+
+};
+
+
+USTRUCT(BlueprintType)
+struct FSTR_ItemBoost : public FTableRowBase {
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FName Name;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UStaticMesh* StaticMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UTexture2D* Icon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 Weight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float UseTime;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float BoostValue;
+
+
+	
+
+
+};
+
+
+
+
+
+
+
+
