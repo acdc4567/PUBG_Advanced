@@ -6,33 +6,31 @@
 #include "Items/PickUpBase.h"
 #include "PUBGA_Enums.h"
 #include "Engine/DataTable.h"
-#include "PickUpHealth.generated.h"
+#include "PickUpBoost.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PUBG_ADVANCED_API APickUpHealth : public APickUpBase
+class PUBG_ADVANCED_API APickUpBoost : public APickUpBase
 {
 	GENERATED_BODY()
 
+
 public:
 
-	APickUpHealth();
+	APickUpBoost();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Publics)
 		int32 SingleWeight;
 
-
-
 protected:
 
 
-	virtual void BeginPlay() override;
+	
+	FString ItemBoostTablePath;
 
-	FString ItemHealthTablePath;
-
-	UDataTable* ItemHealthTableObject;
+	UDataTable* ItemBoostTableObject;
 
 	virtual void OnConstruction(const FTransform& Transform) override;
 

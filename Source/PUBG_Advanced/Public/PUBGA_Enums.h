@@ -38,3 +38,21 @@ enum class EItemType : uint8 {
 };
 
 
+UENUM(BlueprintType)
+enum class EWeaponPosition : uint8 {
+	EWP_Left UMETA(DisplayName = "Left"),
+	EWP_Right UMETA(DisplayName = "Right"),
+
+	EWP_MAX UMETA(DisplayName = "DefaultMAX")
+};
+
+
+
+
+
+
+
+
+
+
+

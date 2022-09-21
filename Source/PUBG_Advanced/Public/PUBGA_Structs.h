@@ -255,6 +255,8 @@ struct FSTR_ItemWeaponAcc : public FTableRowBase {
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float HorizontalAdjPer;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FName SocketName;
 
 };
 
