@@ -9,6 +9,7 @@
 #include "Engine/DataTable.h"
 #include "ItemWeapon.generated.h"
 
+class AItemWeaponAcc;
 /**
  * 
  */
@@ -55,12 +56,31 @@ protected:
 
 	UDataTable* ItemWeaponTableObject;
 
+	FString ItemWeaponAccTablePath;
+
+	UDataTable* ItemWeaponAccTableObject;
+
+
 	virtual void OnConstruction(const FTransform& Transform) override;
 
 	FSTR_ItemWeapon* Datas = nullptr;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
+		AItemWeaponAcc* AccMagObj;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
+		AItemWeaponAcc* AccMuzzleObj;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
+		AItemWeaponAcc* AccSightObj;
 
-	
+	UFUNCTION(BlueprintCallable)
+	void UpdateMag(AItemWeaponAcc* MagAccActor);
+
+	UFUNCTION(BlueprintCallable)
+		void UpdateMuzzle(AItemWeaponAcc* MuzzleAccActor);
+
+	UFUNCTION(BlueprintCallable)
+		void UpdateSight(AItemWeaponAcc* SightAccActor);
+
 };
