@@ -185,6 +185,8 @@ struct FSTR_ItemWeapon : public FTableRowBase {
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UParticleSystem* FireFlashParticles;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 ProbabilityPercent;
 
 };
 
@@ -208,6 +210,8 @@ struct FSTR_ItemAmmo : public FTableRowBase {
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int32 Weight;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 ProbabilityPercent;
 
 };
 
@@ -284,6 +288,8 @@ struct FSTR_ItemEquipment : public FTableRowBase {
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int32 Capacity;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 ProbabilityPercent;
 
 	
 
@@ -315,6 +321,8 @@ struct FSTR_ItemHealth : public FTableRowBase {
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float Limit;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 ProbabilityPercent;
 
 };
 
@@ -341,15 +349,39 @@ struct FSTR_ItemBoost : public FTableRowBase {
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float BoostValue;
 
-
-	
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 ProbabilityPercent;
 
 };
 
 
 
+USTRUCT(BlueprintType)
+struct FSTR_NumberProbability : public FTableRowBase {
+	GENERATED_BODY()
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 Percent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 Number;
+
+	
+};
+
+
+USTRUCT(BlueprintType)
+struct FSTR_ItemTypeProbability : public FTableRowBase {
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 Percent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		EItemType Type;
+
+
+};
 
 
 

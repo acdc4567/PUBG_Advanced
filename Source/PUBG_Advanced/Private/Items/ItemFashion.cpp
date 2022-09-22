@@ -3,3 +3,24 @@
 
 #include "Items/ItemFashion.h"
 
+AItemFashion::AItemFashion() {
+	ItemFashionTablePath = TEXT("DataTable'/Game/_Blueprints/Datas/DT_ItemFashion.DT_ItemFashion'");
+	ItemFashionTableObject = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *ItemFashionTablePath));
+
+
+
+}
+
+void AItemFashion::OnConstruction(const FTransform& Transform) {
+	FSTR_ItemFashion* ItemFashionRow = nullptr;
+	ItemFashionRow = ItemFashionTableObject->FindRow<FSTR_ItemFashion>(ID, TEXT(""));
+	if (ItemFashionRow) {
+		Datas = ItemFashionRow;
+		FashionType = Datas->Type;
+		Init(EItemType::EIT_Fashion, Datas->Name);
+		
+	}
+
+
+
+}
