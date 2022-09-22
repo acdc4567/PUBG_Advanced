@@ -21,11 +21,11 @@ public:
 
 	AItemWeaponAcc();
 
-
+	FSTR_ItemWeaponAcc* Datas = nullptr;
 
 protected:
 
-	FSTR_ItemWeaponAcc* Datas = nullptr;
+	
 
 	EWeaponAccType AccType;
 

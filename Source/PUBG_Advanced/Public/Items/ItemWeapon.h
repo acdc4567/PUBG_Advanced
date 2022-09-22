@@ -10,6 +10,8 @@
 #include "ItemWeapon.generated.h"
 
 class AItemWeaponAcc;
+class UAudioComponent;
+class UParticleSystemComponent;
 /**
  * 
  */
@@ -52,6 +54,15 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
 		UStaticMeshComponent* ButtStock;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
+		UAudioComponent* AudioC;
+
+	
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
+		UParticleSystemComponent* FireFlash;
+
+
 	FString ItemWeaponTablePath;
 
 	UDataTable* ItemWeaponTableObject;
@@ -74,6 +85,13 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
 		AItemWeaponAcc* AccSightObj;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
+		AItemWeaponAcc* AccForegripObj;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
+		AItemWeaponAcc* AccButtstockObj;
+
+
 	UFUNCTION(BlueprintCallable)
 	void UpdateMag(AItemWeaponAcc* MagAccActor);
 
@@ -82,5 +100,26 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 		void UpdateSight(AItemWeaponAcc* SightAccActor);
+
+	UFUNCTION(BlueprintCallable)
+		void UpdateForegrip(AItemWeaponAcc* ForegripAccActor);
+
+	UFUNCTION(BlueprintCallable)
+		void UpdateButtstock(AItemWeaponAcc* ButtstockAccActor);
+
+	UFUNCTION(BlueprintCallable)
+		void PlayFiringSound();
+
+	UFUNCTION(BlueprintCallable)
+		void PlayFiringFlash();
+
+
+
+
+
+
+
+
+
 
 };

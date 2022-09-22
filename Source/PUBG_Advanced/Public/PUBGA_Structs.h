@@ -182,6 +182,8 @@ struct FSTR_ItemWeapon : public FTableRowBase {
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float WalkSpeedPer;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UParticleSystem* FireFlashParticles;
 
 
 };
