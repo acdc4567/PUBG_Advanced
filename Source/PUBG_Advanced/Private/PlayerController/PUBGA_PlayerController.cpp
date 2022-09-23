@@ -7,6 +7,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "PUBGA_Structs.h"
 #include "Items/PickUpBase.h"
+#include "PlayerState/PUBGA_PlayerState.h"
 
 
 
@@ -27,6 +28,27 @@ APUBGA_PlayerController::APUBGA_PlayerController() {
 void APUBGA_PlayerController::OnPossessx1(APUBGA_Character* inCharacter) {
 
 	MyCharacterRef = inCharacter;
+
+}
+
+void APUBGA_PlayerController::BeginPlay() {
+	Super::BeginPlay();
+
+	PlayerStateRef = Cast<APUBGA_PlayerState>(PlayerState);
+
+	if (PlayerStateRef) {
+		PlayerStateRef->OnWeaponChanged.AddDynamic(this, &APUBGA_PlayerController::Event_WeaponChanged);
+	
+		PlayerStateRef->OnEquipmentChanged.AddDynamic(this, &APUBGA_PlayerController::Event_EquipmentChanged);
+	
+		PlayerStateRef->OnFashionChanged.AddDynamic(this, &APUBGA_PlayerController::Event_FashionChanged);
+		
+		MyCharacterRef->GetMesh()->GetAnimInstance()->OnMontageEnded.AddDynamic(this,&APUBGA_PlayerController::Event_OnMontageEnded);
+	
+	
+	}
+
+
 
 }
 
@@ -55,6 +77,8 @@ void APUBGA_PlayerController::SetupInputComponent() {
 	InputComponent->BindAction("LeftShift", IE_Pressed, this, &APUBGA_PlayerController::RunKeyPressed);
 	InputComponent->BindAction("LeftShift", IE_Released, this, &APUBGA_PlayerController::RunKeyReleased);
 
+	InputComponent->BindAction("Aim", IE_Pressed, this, &APUBGA_PlayerController::AimKeyPressed);
+	InputComponent->BindAction("Aim", IE_Released, this, &APUBGA_PlayerController::AimKeyReleased);
 
 
 
@@ -118,6 +142,7 @@ void APUBGA_PlayerController::MoveFwd(float AxisValue) {
 	if (MoveForwardAxis != AxisValue) {
 		MoveForwardAxis = AxisValue;
 		UpdateCameraHeight();
+		MyCharacterRef->UpdateWeaponDisplay(CalculateHoldGunSocket());
 	}
 
 	if (bEnableMove) {
@@ -131,7 +156,7 @@ void APUBGA_PlayerController::MoveRt(float AxisValue) {
 	if (MoveRightAxis != AxisValue) {
 		MoveRightAxis = AxisValue;
 		UpdateCameraHeight();
-
+		MyCharacterRef->UpdateWeaponDisplay(CalculateHoldGunSocket());
 	}
 
 	if (bEnableMove) {
@@ -225,6 +250,8 @@ void APUBGA_PlayerController::CrouchKeyPressed() {
 	}
 	UpdateCameraHeight();
 
+	MyCharacterRef->UpdateWeaponDisplay(CalculateHoldGunSocket());
+
 }
 
 
@@ -249,7 +276,22 @@ void APUBGA_PlayerController::ProneKeyPressed() {
 	}
 	
 	UpdateCameraHeight();
+	MyCharacterRef->UpdateWeaponDisplay(CalculateHoldGunSocket());
+
 }
+
+void APUBGA_PlayerController::AimKeyPressed() {
+	if (!MyCharacterRef)return;
+	MyCharacterRef->SetIsAiming(1);
+	MyCharacterRef->UpdateWeaponDisplay(CalculateHoldGunSocket());
+
+}
+void APUBGA_PlayerController::AimKeyReleased() {
+	if (!MyCharacterRef)return;
+	MyCharacterRef->SetIsAiming(0);
+	MyCharacterRef->UpdateWeaponDisplay(CalculateHoldGunSocket());
+}
+
 
 void APUBGA_PlayerController::JumpKeyPressed() {
 	if (!MyCharacterRef)return;
@@ -599,7 +641,9 @@ void APUBGA_PlayerController::ReturnThreeIntegers(int32& HoldWeapon, int32& Post
 }
 
 FName APUBGA_PlayerController::CalculateHoldGunSocket() {
+	
 	FName GunSocket;
+	if (!MyCharacterRef)return FName();
 	if (MyCharacterRef->GetIsProne()) {
 		if (MoveForwardAxis == 0.f && MoveRightAxis == 0.f) {
 			GunSocket = GunProneIdleName;
@@ -614,9 +658,64 @@ FName APUBGA_PlayerController::CalculateHoldGunSocket() {
 			}
 		}
 	}
+	else {
+		if (MyCharacterRef->GetIsCrouching() && !MyCharacterRef->GetIsAiming()) {
+			GunSocket = GunCrouchName;
+		}
+		else {
+			if (MyCharacterRef->GetIsAiming()||MyCharacterRef->GetIsFiring()) {
+				GunSocket = GunAimName;
+			}
+			else {
+				if (MyCharacterRef->GetIsReload()) {
+					GunSocket = GunReloadName;
+				}
+				else {
+					GunSocket = GunStandName;
+				}
+			}
+		}
+	}
 
 	return GunSocket;
 }
+
+
+void APUBGA_PlayerController::Event_WeaponChanged(AItemWeapon* Weapon, EWeaponPosition Position, bool bIsOnHand) {
+	if (!MyCharacterRef)return;
+	MyCharacterRef->UpdateWeaponDisplay(CalculateHoldGunSocket());
+
+
+
+}
+
+void APUBGA_PlayerController::Event_EquipmentChanged(AItemBase* Equipment, bool bIsAdd) {
+	if (!MyCharacterRef)return;
+	MyCharacterRef->UpdateEquipmentDisplay();
+	MyCharacterRef->UpdateWeaponDisplay("None");
+
+
+}
+
+
+void APUBGA_PlayerController::Event_FashionChanged(AItemBase* Fashion, bool bIsAdd) {
+
+	if (!MyCharacterRef)return;
+	MyCharacterRef->UpdateFashionDisplay();
+
+}
+
+void APUBGA_PlayerController::Event_OnMontageEnded(UAnimMontage* Montage, bool bInterrupted) {
+	if (!MyCharacterRef)return;
+	if (!MyCharacterRef->GetCurrentMontage()) {
+		MyCharacterRef->SetIsPlayingMontage(0);
+	}
+
+
+}
+
+
+
 
 
 

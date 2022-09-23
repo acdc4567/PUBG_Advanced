@@ -10,7 +10,7 @@
 
 class APUBGA_Character;
 class APickUpBase;
-
+class APUBGA_PlayerState;
 
 
 
@@ -33,6 +33,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 protected:
+
+	virtual void BeginPlay() override;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Players)
 		APUBGA_Character* MyCharacterRef;
 
@@ -166,6 +169,9 @@ protected:
 	void RunKeyPressed();
 	void RunKeyReleased();
 
+	void AimKeyPressed();
+	void AimKeyReleased();
+
 	void UpdateWalkSpeed();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Input)
@@ -186,7 +192,25 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Items)
 		TArray<APickUpBase*> ItemsInRange;
 
+	
 	FName CalculateHoldGunSocket();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Input)
+		APUBGA_PlayerState* PlayerStateRef;
+
+	UFUNCTION()
+		void Event_WeaponChanged(AItemWeapon* Weapon, EWeaponPosition Position, bool bIsOnHand);
+
+	UFUNCTION()
+		void Event_EquipmentChanged(AItemBase* Equipment, bool bIsAdd);
+
+	UFUNCTION()
+		void Event_FashionChanged(AItemBase* Fashion, bool bIsAdd);
+
+	UFUNCTION()
+		void Event_OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
+
 
 public:
 

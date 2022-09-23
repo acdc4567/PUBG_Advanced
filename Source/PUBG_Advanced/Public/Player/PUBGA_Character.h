@@ -131,19 +131,7 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = CharacterState, meta = (AllowPrivateAccess = "true"))
 		bool bIsAiming = 0;
 
-	UFUNCTION(BlueprintCallable)
-		void UpdateWeaponDisplay(FName HoldSocket);
-
-	void Attach(AItemWeapon* WeaponToAttach, FName SocksName);
-
-	UFUNCTION(BlueprintCallable)
-		void UpdateEquipmentDisplay();
-
-	UFUNCTION(BlueprintCallable)
-		void ClearFashion();
-
-	UFUNCTION(BlueprintCallable)
-		void UpdateFashionDisplay();
+	
 
 
 
@@ -178,6 +166,8 @@ public:
 	void SetIsProne(const bool& Valuex);
 	void SetIsCrouching(const bool& Valuex);
 	void SetIsAiming(const bool& Valuex);
+	FORCEINLINE void SetIsPlayingMontage(bool bValue) { bIsPlayingMontage = bValue; }
+	
 
 
 	virtual void PossessedBy(AController* inController) override;
@@ -188,7 +178,23 @@ public:
 	UFUNCTION(Category = MouseInput)
 		void MouseLookUp(float AxisValue);
 
-	
+
+	void UpdateWeaponDisplay(FName HoldSocket);
+
+	void Attach(AItemWeapon* WeaponToAttach, FName SocksName);
+
+	void UpdateEquipmentDisplay();
+
+	void ClearFashion();
+
+	void UpdateFashionDisplay();
+
+
+
+
+
+
+
 
 
 };

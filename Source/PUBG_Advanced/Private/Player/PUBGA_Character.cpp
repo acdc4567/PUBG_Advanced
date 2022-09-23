@@ -264,9 +264,9 @@ void APUBGA_Character::UpdateWeaponDisplay(FName HoldSocket) {
 	}
 	
 	bool bIsEquipBackpack = 0;
-	const auto Equipments = PlayerStateRef->GetEquipments();
-	if (Equipments!=nullptr) {
-		for (auto Equipment : Equipments) {
+	TArray<AItemBase*> Equipments = PlayerStateRef->GetEquipments();
+	if (!Equipments.IsEmpty()) {
+		for (AItemBase* Equipment : Equipments) {
 			if (Equipment->ItemType == EItemType::EIT_Backpack) {
 				bIsEquipBackpack = 1;
 
@@ -316,41 +316,38 @@ void APUBGA_Character::UpdateEquipmentDisplay() {
 
 	bool bHasHelmet = 0;
 
-	const auto Equipments = PlayerStateRef->GetEquipments();
-	if (Equipments) {
+	TArray<AItemBase*> Equipments = PlayerStateRef->GetEquipments();
+	if (!Equipments.IsEmpty()) {
 
-		for (auto Equipment : Equipments) {
+		for (AItemBase* Equipment : Equipments) {
+			if (Equipment->ItemType == EItemType::EIT_Helmet) {
+				const USkeletalMeshSocket* HelmetSocket = GetMesh()->GetSocketByName(PlayerControllerRef->HelmetName);
+				const FTransform SocketTransform = HelmetSocket->GetSocketTransform(GetMesh());
+				Equipment->SetActorTransform(SocketTransform);
+				FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, EAttachmentRule::KeepRelative, true);
+				Equipment->AttachToComponent(GetMesh(), AttachmentRules, PlayerControllerRef->HelmetName);
 
-			switch (Equipment->ItemType) {
-			case EItemType::EIT_Weapon:
-				break;
-			case EItemType::EIT_Accessories:
-				break;
-			case EItemType::EIT_Ammo:
-				break;
-			case EItemType::EIT_Health:
-				break;
-			case EItemType::EIT_Boost:
-				break;
-			case EItemType::EIT_Helmet:
-				Attach(Equipment,PlayerControllerRef->HelmetName);
 				bHasHelmet = 1;
-				break;
-			case EItemType::EIT_Vest:
-				Attach(Equipment, PlayerControllerRef->VestName);
 
-				break;
-			case EItemType::EIT_Backpack:
-				Attach(Equipment, PlayerControllerRef->BackpackName);
-
-				break;
-			case EItemType::EIT_Fashion:
-				break;
-			case EItemType::EIT_MAX:
-				break;
-			default:
-				break;
 			}
+			else if(Equipment->ItemType == EItemType::EIT_Vest) {
+				const USkeletalMeshSocket* VestSocket = GetMesh()->GetSocketByName(PlayerControllerRef->VestName);
+				const FTransform SocketTransform1 = VestSocket->GetSocketTransform(GetMesh());
+				Equipment->SetActorTransform(SocketTransform1);
+				FAttachmentTransformRules AttachmentRules1(EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, EAttachmentRule::KeepRelative, true);
+				Equipment->AttachToComponent(GetMesh(), AttachmentRules1, PlayerControllerRef->VestName);
+
+			}
+			else if(Equipment->ItemType == EItemType::EIT_Backpack) {
+				const USkeletalMeshSocket* BPSocket = GetMesh()->GetSocketByName(PlayerControllerRef->BackpackName);
+				const FTransform SocketTransform2 = BPSocket->GetSocketTransform(GetMesh());
+				Equipment->SetActorTransform(SocketTransform2);
+				FAttachmentTransformRules AttachmentRules2(EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, EAttachmentRule::KeepRelative, true);
+				Equipment->AttachToComponent(GetMesh(), AttachmentRules2, PlayerControllerRef->BackpackName);
+
+			}
+
+			
 
 		}
 
@@ -381,9 +378,9 @@ void APUBGA_Character::UpdateFashionDisplay() {
 	if (!PlayerStateRef)return;
 	
 	ClearFashion();
-	const auto Fashions = PlayerStateRef->GetFashions();
-	if (Fashions) {
-		for (auto Fashion : Fashions) {
+	TArray<AItemBase*> Fashions = PlayerStateRef->GetFashions();
+	if (!Fashions.IsEmpty()) {
+		for (AItemBase* Fashion : Fashions) {
 			AItemFashion* TempFashion = Cast<AItemFashion>(Fashion);
 			if (TempFashion) {
 				ReplaceSkeletalMesh(TempFashion->FashionType,TempFashion->ID);
