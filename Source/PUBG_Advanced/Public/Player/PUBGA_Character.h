@@ -18,6 +18,7 @@ class UTexture;
 class APickUpBase;
 class APUBGA_PlayerState;
 class AItemWeapon;
+class UAnimMontage;
 
 
 
@@ -117,7 +118,54 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Meshes)
 		APUBGA_PlayerState* PlayerStateRef;
 
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
+		UAnimMontage* StandEquipMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
+		UAnimMontage* StandUnEquipMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
+		UAnimMontage* StandReloadMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
+		UAnimMontage* StandFireMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
+		UAnimMontage* StandUseMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
+		UAnimMontage* CrouchEquipMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
+		UAnimMontage* CrouchUnEquipMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
+		UAnimMontage* CrouchReloadMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
+		UAnimMontage* CrouchFireMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
+		UAnimMontage* CrouchUseMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
+		UAnimMontage* ProneEquipMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
+		UAnimMontage* ProneUnEquipMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
+		UAnimMontage* ProneReloadMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
+		UAnimMontage* ProneFireMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
+		UAnimMontage* ProneUseMontage;
+
+	void InitAnimations();
+
+	void EquipNotifyHandle(USkeletalMeshComponent* MyMesh);
+
+	void EquipFinishedNotifyHandle(USkeletalMeshComponent* MyMesh);
+
+	void UnEquipNotifyHandle(USkeletalMeshComponent* MyMesh);
+
+	void UnEquipFinishedNotifyHandle(USkeletalMeshComponent* MyMesh);
+
+	void FireEndNotifyHandle(USkeletalMeshComponent* MyMesh);
+
+	void ReloadEndNotifyHandle(USkeletalMeshComponent* MyMesh);
+
+
 
 
 private:
@@ -131,6 +179,8 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = CharacterState, meta = (AllowPrivateAccess = "true"))
 		bool bIsAiming = 0;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = CharacterState, meta = (AllowPrivateAccess = "true"))
+		EMontageType PlayingMontageType;
 	
 
 
@@ -169,7 +219,8 @@ public:
 	void SetIsCrouching(const bool& Valuex);
 	void SetIsAiming(const bool& Valuex);
 	FORCEINLINE void SetIsPlayingMontage(bool bValue) { bIsPlayingMontage = bValue; }
-	
+	FORCEINLINE void SetIsHoldWeapon(bool bValue) { bIsHoldWeapon = bValue; }
+
 
 
 	virtual void PossessedBy(AController* inController) override;
@@ -191,7 +242,7 @@ public:
 
 	void UpdateFashionDisplay();
 
-
+	void PlayMontage(EMontageType MontageType);
 
 
 

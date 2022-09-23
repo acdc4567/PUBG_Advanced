@@ -101,6 +101,14 @@ void APUBGA_PlayerController::SetupInputComponent() {
 
 	InputComponent->BindAction("DiscardWeapon", IE_Pressed, this, &APUBGA_PlayerController::DiscardKeyPressed);
 
+	InputComponent->BindAction("Interaction", IE_Pressed, this, &APUBGA_PlayerController::InteractionKeyPressed);
+
+	InputComponent->BindAction("TakeBackGun", IE_Pressed, this, &APUBGA_PlayerController::TakeBackKeyPressed);
+
+	InputComponent->BindAction("Keyboard1", IE_Pressed, this, &APUBGA_PlayerController::Keyboard1KeyPressed);
+
+	InputComponent->BindAction("Keyboard2", IE_Pressed, this, &APUBGA_PlayerController::Keyboard2KeyPressed);
+
 
 }
 
@@ -704,7 +712,7 @@ FName APUBGA_PlayerController::CalculateHoldGunSocket() {
 void APUBGA_PlayerController::Event_WeaponChanged(AItemWeapon* Weapon, EWeaponPosition Position, bool bIsOnHand) {
 	if (!MyCharacterRef)return;
 	MyCharacterRef->UpdateWeaponDisplay(CalculateHoldGunSocket());
-
+	UpdateCharacterGunState();
 
 
 }
@@ -1204,6 +1212,254 @@ void APUBGA_PlayerController::DiscardKeyPressed() {
 }
 
 
+void APUBGA_PlayerController::PickupWeapon(APickUpWeapon* PickupWeaponx, bool bIsAssign, EWeaponPosition Positionx) {
+	if (!PlayerStateRef)return;
+	EWeaponPosition TargetPosition;
+	bool bTargetIsOnHand;
+	if (bIsAssign) {
+		AssignPosition(Positionx, TargetPosition, bTargetIsOnHand);
+	}
+	else {
+		TargetPosition =AutoPosition(bTargetIsOnHand);
+	}
+	AItemWeapon* ReplaceWeapon = nullptr;
+	if (bTargetIsOnHand) {
+		if (PlayerStateRef->GetHoldGun()) {
+			ReplaceWeapon = PlayerStateRef->GetHoldGun();
+		}
+		else {
+			if (TargetPosition == EWeaponPosition::EWP_Left) {
+				if (PlayerStateRef->GetWeapon1()) {
+					ReplaceWeapon = PlayerStateRef->GetWeapon1();
+				}
+			}
+			else if(TargetPosition==EWeaponPosition::EWP_Right) {
+				if (PlayerStateRef->GetWeapon2()) {
+					ReplaceWeapon = PlayerStateRef->GetWeapon2();
+				}
+			}
+		}
+	}
+	if (ReplaceWeapon) {
+		DiscardWeapon(ReplaceWeapon);
+		
+	}
+	AItemWeapon* IBWeapon = nullptr;
+	FTransform Transformx;
+	Transformx.SetLocation(FVector::ZeroVector);
+
+	IBWeapon = GetWorld()->SpawnActorDeferred<AItemWeapon>(AItemWeapon::StaticClass(), Transformx);
+	if (IBWeapon) {
+		IBWeapon->ID = PickupWeaponx->ID;
+		IBWeapon->SN = PickupWeaponx->SN;
+		IBWeapon->Position = TargetPosition;
+		IBWeapon->bIsOnHand = bTargetIsOnHand;
+		IBWeapon->Amount = 1;
+		IBWeapon->Ammo = PickupWeaponx->Ammo;
+
+
+		IBWeapon->FinishSpawning(Transformx);
+		
+		
+		if (bTargetIsOnHand) {
+			PlayerStateRef->SetHoldGun(IBWeapon);
+
+		}
+		else {
+			switch (TargetPosition) {
+			case EWeaponPosition::EWP_Left:
+				PlayerStateRef->SetWeapon1(IBWeapon);
+				break;
+			case EWeaponPosition::EWP_Right:
+				PlayerStateRef->SetWeapon2(IBWeapon);
+				break;
+			case EWeaponPosition::EWP_MAX:
+
+				break;
+			default:
+				break;
+			}
+		}
+	}
+	
+
+}
+
+bool APUBGA_PlayerController::PickUpItemSuccess() {
+	
+	if (ReadyPickupItem) {
+		APickUpWeapon* TempPUWeapon = nullptr;
+		bool bAssignPos = 0;
+		EWeaponPosition WPNPos = EWeaponPosition::EWP_Left;
+		switch (ReadyPickupItem->ItemType) {
+		case EItemType::EIT_Weapon:
+			TempPUWeapon = Cast<APickUpWeapon>(ReadyPickupItem);
+			bAssignPos=0;
+			WPNPos=EWeaponPosition::EWP_Left;
+			PickupWeapon(TempPUWeapon,bAssignPos,WPNPos);
+			ReadyPickupItem->Destroy();
+			return 1;
+			break;
+		case EItemType::EIT_Accessories:
+
+
+			break;
+		case EItemType::EIT_Ammo:
+
+
+			break;
+		case EItemType::EIT_Health:
+
+
+			break;
+		case EItemType::EIT_Boost:
+
+
+			break;
+		case EItemType::EIT_Helmet:
+
+
+			break;
+		case EItemType::EIT_Vest:
+
+
+			break;
+		case EItemType::EIT_Backpack:
+
+
+			break;
+		case EItemType::EIT_Fashion:
+
+
+			break;
+		case EItemType::EIT_MAX:
+
+
+			break;
+		default:
+			break;
+		}
+
+
+	}
+	else {
+		return 0;
+	}
+	
+	
+	return 0;
+}
+
+
+void APUBGA_PlayerController::InteractionKeyPressed() {
+	bool bTemp= PickUpItemSuccess();
+}
+
+void APUBGA_PlayerController::UpdateCharacterGunState() {
+	if (!PlayerStateRef)return;
+	if (!MyCharacterRef)return;
+	if (PlayerStateRef->GetHoldGun()) {
+		MyCharacterRef->SetIsHoldWeapon(1);
+
+	}
+	else {
+		MyCharacterRef->SetIsHoldWeapon(0);
+	}
+
+
+}
+
+
+void APUBGA_PlayerController::TakeBackKeyPressed() {
+	if (!PlayerStateRef)return;
+	if (!MyCharacterRef)return;
+	if (PlayerStateRef->GetHoldGun()) {
+		MyCharacterRef->PlayMontage(EMontageType::EMT_UnEquip);
+	}
+}
+
+void APUBGA_PlayerController::TakeBackWeapon() {
+	if (!MyCharacterRef)return;
+	if (!PlayerStateRef)return;
+	MyCharacterRef->SetIsHoldWeapon(0);
+	PlayerStateRef->GetHoldGun()->bIsOnHand = 0;
+	switch (PlayerStateRef->GetHoldGun()->Position) {
+	case EWeaponPosition::EWP_Left:
+		PlayerStateRef->SetWeapon1(PlayerStateRef->GetHoldGun());
+		break;
+	case EWeaponPosition::EWP_Right:
+		PlayerStateRef->SetWeapon2(PlayerStateRef->GetHoldGun());
+		break;
+	case EWeaponPosition::EWP_MAX:
+		break;
+	default:
+		break;
+	}
+	PlayerStateRef->SetHoldGun(nullptr);
+
+	if (ReadyEquipWeapon) {
+		MyCharacterRef->PlayMontage(EMontageType::EMT_Equip);
+	}
+
+}
+
+void APUBGA_PlayerController::Keyboard1KeyPressed() {
+	if (!PlayerStateRef)return;
+	if (!MyCharacterRef)return;
+	ReadyEquipWeapon = PlayerStateRef->GetWeapon1();
+	if (ReadyEquipWeapon) {
+		if (PlayerStateRef->GetHoldGun()) {
+			MyCharacterRef->PlayMontage(EMontageType::EMT_UnEquip);
+		}
+		else {
+			MyCharacterRef->PlayMontage(EMontageType::EMT_Equip);
+		}
+	}
+
+
+
+}
+
+
+void APUBGA_PlayerController::Keyboard2KeyPressed() {
+	if (!PlayerStateRef)return;
+	ReadyEquipWeapon = PlayerStateRef->GetWeapon2();
+	if (ReadyEquipWeapon) {
+		if (PlayerStateRef->GetHoldGun()) {
+			MyCharacterRef->PlayMontage(EMontageType::EMT_UnEquip);
+		}
+		else {
+			MyCharacterRef->PlayMontage(EMontageType::EMT_Equip);
+		}
+	}
+}
+
+void APUBGA_PlayerController::EquipWeapon() {
+	if (!MyCharacterRef)return;
+	if (!PlayerStateRef)return;
+	if (!ReadyEquipWeapon)return;
+	MyCharacterRef->SetIsHoldWeapon(1);
+
+	PlayerStateRef->SetHoldGun(ReadyEquipWeapon);
+	ReadyEquipWeapon->bIsOnHand = 1;
+	switch (ReadyEquipWeapon->Position) {
+	case EWeaponPosition::EWP_Left:
+		PlayerStateRef->SetWeapon1(nullptr);
+		ReadyEquipWeapon = nullptr;
+		break;
+	case EWeaponPosition::EWP_Right:
+		PlayerStateRef->SetWeapon2(nullptr);
+		ReadyEquipWeapon = nullptr;
+		break;
+	case EWeaponPosition::EWP_MAX:
+		break;
+	default:
+		break;
+	}
+
+
+
+}
 
 
 

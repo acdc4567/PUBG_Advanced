@@ -16,6 +16,12 @@
 #include "Engine/SkeletalMeshSocket.h"
 #include "Items/ItemWeapon.h"
 #include "Items/ItemFashion.h"
+#include "Animation/Notifies/OnEquipAnimNotify.h"
+#include "Animation/Notifies/OnEquipEndAnimNotify.h"
+#include "Animation/Notifies/OnUnEquipAnimNotify.h"
+#include "Animation/Notifies/OnUnEquipEndAnimNotify.h"
+#include "Animation/Notifies/FireEndAnimNotify.h"
+#include "Animation/Notifies/ReloadEndAnimNotify.h"
 
 
 
@@ -73,7 +79,7 @@ void APUBGA_Character::BeginPlay()
 
 	}
 
-	
+	InitAnimations();
 
 
 }
@@ -393,3 +399,362 @@ void APUBGA_Character::UpdateFashionDisplay() {
 
 }
 
+
+
+void APUBGA_Character::PlayMontage(EMontageType MontageType) {
+	PlayingMontageType = MontageType;
+	bIsPlayingMontage = 1;
+	if (bIsProne) {
+
+		switch (MontageType) {
+		case EMontageType::EMT_Equip:
+			PlayAnimMontage(ProneEquipMontage);
+
+			break;
+		case EMontageType::EMT_UnEquip:
+			PlayAnimMontage(ProneUnEquipMontage);
+
+			break;
+		case EMontageType::EMT_Reload:
+			PlayAnimMontage(ProneReloadMontage);
+
+			break;
+		case EMontageType::EMT_ReloadBullet:
+			PlayAnimMontage(ProneReloadMontage,1.f,"ReloadBullet");
+
+			break;
+		case EMontageType::EMT_Fire:
+			PlayAnimMontage(ProneFireMontage);
+
+			break;
+		case EMontageType::EMT_UseItem:
+			PlayAnimMontage(ProneUseMontage);
+
+			break;
+		case EMontageType::EMT_MAX:
+			PlayAnimMontage(ProneUseMontage);
+
+			break;
+		default:
+			break;
+		}
+	}
+	else {
+		if (bIsCrouching) {
+
+			switch (MontageType) {
+			case EMontageType::EMT_Equip:
+				PlayAnimMontage(CrouchEquipMontage);
+
+				break;
+			case EMontageType::EMT_UnEquip:
+				PlayAnimMontage(CrouchUnEquipMontage);
+
+				break;
+			case EMontageType::EMT_Reload:
+				PlayAnimMontage(CrouchReloadMontage);
+
+				break;
+			case EMontageType::EMT_ReloadBullet:
+				PlayAnimMontage(CrouchReloadMontage, 1.f, "ReloadBullet");
+
+				break;
+			case EMontageType::EMT_Fire:
+				PlayAnimMontage(CrouchFireMontage);
+
+				break;
+			case EMontageType::EMT_UseItem:
+				PlayAnimMontage(CrouchUseMontage);
+
+				break;
+			case EMontageType::EMT_MAX:
+				PlayAnimMontage(CrouchUseMontage);
+
+				break;
+			default:
+				break;
+			}
+
+
+		}
+		else {
+			switch (MontageType) {
+			case EMontageType::EMT_Equip:
+				PlayAnimMontage(StandEquipMontage);
+
+				break;
+			case EMontageType::EMT_UnEquip:
+				PlayAnimMontage(StandUnEquipMontage);
+
+				break;
+			case EMontageType::EMT_Reload:
+				PlayAnimMontage(StandReloadMontage);
+
+				break;
+			case EMontageType::EMT_ReloadBullet:
+				PlayAnimMontage(StandReloadMontage, 1.f, "ReloadBullet");
+
+				break;
+			case EMontageType::EMT_Fire:
+				PlayAnimMontage(StandFireMontage);
+
+				break;
+			case EMontageType::EMT_UseItem:
+				PlayAnimMontage(StandUseMontage);
+
+				break;
+			case EMontageType::EMT_MAX:
+				PlayAnimMontage(StandUseMontage);
+
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
+
+
+}
+
+
+void APUBGA_Character::InitAnimations() {
+	
+
+	if (!StandEquipMontage)return;
+	if (!StandUnEquipMontage)return;
+	if (!StandReloadMontage)return;
+	if (!StandFireMontage)return;
+	if (!StandUseMontage)return;
+	if (!CrouchEquipMontage)return;
+	if (!CrouchUnEquipMontage)return;
+	if (!CrouchReloadMontage)return;
+	if (!CrouchFireMontage)return;
+	if (!CrouchUseMontage)return;
+	if (!ProneEquipMontage)return;
+	if (!ProneUnEquipMontage)return;
+	if (!ProneReloadMontage)return;
+	if (!ProneFireMontage)return;
+	if (!ProneUseMontage)return;
+
+
+	const auto NotifyEvents = StandEquipMontage->Notifies;
+	for (auto NotifyEvent : NotifyEvents) {
+		auto EquipNotify = Cast<UOnEquipAnimNotify>(NotifyEvent.Notify);
+		if (EquipNotify) {
+			EquipNotify->OnNotified.AddUObject(this, &APUBGA_Character::EquipNotifyHandle);
+
+			break;
+		}
+
+	}
+	for (auto NotifyEvent : NotifyEvents) {
+		auto EquipEndNotify = Cast<UOnEquipEndAnimNotify>(NotifyEvent.Notify);
+		if (EquipEndNotify) {
+			EquipEndNotify->OnNotifiedEnd.AddUObject(this, &APUBGA_Character::EquipFinishedNotifyHandle);
+
+			break;
+		}
+
+	}
+
+	const auto NotifyEvents1 = StandUnEquipMontage->Notifies;
+	for (auto NotifyEvent : NotifyEvents1) {
+		auto UnEquipNotify = Cast<UOnUnEquipAnimNotify>(NotifyEvent.Notify);
+		if (UnEquipNotify) {
+			UnEquipNotify->OnNotified.AddUObject(this, &APUBGA_Character::UnEquipNotifyHandle);
+
+			break;
+		}
+
+	}
+	for (auto NotifyEvent : NotifyEvents1) {
+		auto UnEquipEndNotify = Cast<UOnUnEquipEndAnimNotify>(NotifyEvent.Notify);
+		if (UnEquipEndNotify) {
+			UnEquipEndNotify->OnNotified.AddUObject(this, &APUBGA_Character::UnEquipFinishedNotifyHandle);
+
+			break;
+		}
+
+	}
+
+	const auto NotifyEvents2 = StandReloadMontage->Notifies;
+	for (auto NotifyEvent : NotifyEvents2) {
+		auto ReloadNotify = Cast<UReloadEndAnimNotify>(NotifyEvent.Notify);
+		if (ReloadNotify) {
+			ReloadNotify->OnNotified.AddUObject(this, &APUBGA_Character::ReloadEndNotifyHandle);
+
+			break;
+		}
+
+	}
+
+	const auto NotifyEvents3 = StandFireMontage->Notifies;
+	for (auto NotifyEvent : NotifyEvents3) {
+		auto FireEndNotify = Cast<UFireEndAnimNotify>(NotifyEvent.Notify);
+		if (FireEndNotify) {
+			FireEndNotify->OnNotified.AddUObject(this, &APUBGA_Character::FireEndNotifyHandle);
+
+			break;
+		}
+
+	}
+
+	const auto NotifyEvents4 = CrouchEquipMontage->Notifies;
+	for (auto NotifyEvent : NotifyEvents4) {
+		auto EquipNotify = Cast<UOnEquipAnimNotify>(NotifyEvent.Notify);
+		if (EquipNotify) {
+			EquipNotify->OnNotified.AddUObject(this, &APUBGA_Character::EquipNotifyHandle);
+
+			break;
+		}
+
+	}
+	for (auto NotifyEvent : NotifyEvents4) {
+		auto EquipEndNotify = Cast<UOnEquipEndAnimNotify>(NotifyEvent.Notify);
+		if (EquipEndNotify) {
+			EquipEndNotify->OnNotifiedEnd.AddUObject(this, &APUBGA_Character::EquipFinishedNotifyHandle);
+
+			break;
+		}
+
+	}
+
+	const auto NotifyEvents5 = CrouchUnEquipMontage->Notifies;
+	for (auto NotifyEvent : NotifyEvents5) {
+		auto UnEquipNotify = Cast<UOnUnEquipAnimNotify>(NotifyEvent.Notify);
+		if (UnEquipNotify) {
+			UnEquipNotify->OnNotified.AddUObject(this, &APUBGA_Character::UnEquipNotifyHandle);
+
+			break;
+		}
+
+	}
+	for (auto NotifyEvent : NotifyEvents5) {
+		auto UnEquipEndNotify = Cast<UOnUnEquipEndAnimNotify>(NotifyEvent.Notify);
+		if (UnEquipEndNotify) {
+			UnEquipEndNotify->OnNotified.AddUObject(this, &APUBGA_Character::UnEquipFinishedNotifyHandle);
+
+			break;
+		}
+
+	}
+
+	const auto NotifyEvents6 = CrouchReloadMontage->Notifies;
+	for (auto NotifyEvent : NotifyEvents6) {
+		auto ReloadNotify = Cast<UReloadEndAnimNotify>(NotifyEvent.Notify);
+		if (ReloadNotify) {
+			ReloadNotify->OnNotified.AddUObject(this, &APUBGA_Character::ReloadEndNotifyHandle);
+
+			break;
+		}
+
+	}
+
+	const auto NotifyEvents7 = CrouchFireMontage->Notifies;
+	for (auto NotifyEvent : NotifyEvents7) {
+		auto FireEndNotify = Cast<UFireEndAnimNotify>(NotifyEvent.Notify);
+		if (FireEndNotify) {
+			FireEndNotify->OnNotified.AddUObject(this, &APUBGA_Character::FireEndNotifyHandle);
+
+			break;
+		}
+
+	}
+
+	const auto NotifyEvents8 = ProneEquipMontage->Notifies;
+	for (auto NotifyEvent : NotifyEvents8) {
+		auto EquipNotify = Cast<UOnEquipAnimNotify>(NotifyEvent.Notify);
+		if (EquipNotify) {
+			EquipNotify->OnNotified.AddUObject(this, &APUBGA_Character::EquipNotifyHandle);
+
+			break;
+		}
+
+	}
+	for (auto NotifyEvent : NotifyEvents8) {
+		auto EquipEndNotify = Cast<UOnEquipEndAnimNotify>(NotifyEvent.Notify);
+		if (EquipEndNotify) {
+			EquipEndNotify->OnNotifiedEnd.AddUObject(this, &APUBGA_Character::EquipFinishedNotifyHandle);
+
+			break;
+		}
+
+	}
+
+	const auto NotifyEvents9 = ProneUnEquipMontage->Notifies;
+	for (auto NotifyEvent : NotifyEvents9) {
+		auto UnEquipNotify = Cast<UOnUnEquipAnimNotify>(NotifyEvent.Notify);
+		if (UnEquipNotify) {
+			UnEquipNotify->OnNotified.AddUObject(this, &APUBGA_Character::UnEquipNotifyHandle);
+
+			break;
+		}
+
+	}
+	for (auto NotifyEvent : NotifyEvents9) {
+		auto UnEquipEndNotify = Cast<UOnUnEquipEndAnimNotify>(NotifyEvent.Notify);
+		if (UnEquipEndNotify) {
+			UnEquipEndNotify->OnNotified.AddUObject(this, &APUBGA_Character::UnEquipFinishedNotifyHandle);
+
+			break;
+		}
+
+	}
+
+	const auto NotifyEvents10 = ProneReloadMontage->Notifies;
+	for (auto NotifyEvent : NotifyEvents10) {
+		auto ReloadNotify = Cast<UReloadEndAnimNotify>(NotifyEvent.Notify);
+		if (ReloadNotify) {
+			ReloadNotify->OnNotified.AddUObject(this, &APUBGA_Character::ReloadEndNotifyHandle);
+
+			break;
+		}
+
+	}
+
+	const auto NotifyEvents11 = ProneFireMontage->Notifies;
+	for (auto NotifyEvent : NotifyEvents11) {
+		auto FireEndNotify = Cast<UFireEndAnimNotify>(NotifyEvent.Notify);
+		if (FireEndNotify) {
+			FireEndNotify->OnNotified.AddUObject(this, &APUBGA_Character::FireEndNotifyHandle);
+
+			break;
+		}
+
+	}
+
+
+
+
+}
+
+
+void APUBGA_Character::EquipNotifyHandle(USkeletalMeshComponent* MyMesh) {
+	if (!PlayerControllerRef)return;
+	PlayerControllerRef->EquipWeapon();
+
+}
+
+void APUBGA_Character::EquipFinishedNotifyHandle(USkeletalMeshComponent* MyMesh) {
+
+}
+
+void APUBGA_Character::UnEquipNotifyHandle(USkeletalMeshComponent* MyMesh){
+	if (!PlayerControllerRef)return;
+	PlayerControllerRef->TakeBackWeapon();
+
+}
+
+void APUBGA_Character::UnEquipFinishedNotifyHandle(USkeletalMeshComponent* MyMesh){
+
+
+}
+
+void APUBGA_Character::FireEndNotifyHandle(USkeletalMeshComponent* MyMesh) {
+
+}
+
+void APUBGA_Character::ReloadEndNotifyHandle(USkeletalMeshComponent* MyMesh) {
+
+}

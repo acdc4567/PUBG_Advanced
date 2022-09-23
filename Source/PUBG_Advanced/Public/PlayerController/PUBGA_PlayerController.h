@@ -12,8 +12,8 @@ class APUBGA_Character;
 class APickUpBase;
 class APUBGA_PlayerState;
 class APUBGA_GameModeBase;
-
-
+class APickUpWeapon;
+class AItemWeapon;
 /**
  * 
  */
@@ -245,6 +245,22 @@ protected:
 
 	void DiscardKeyPressed();
 
+	void PickupWeapon(APickUpWeapon* PickupWeaponx, bool bIsAssign, EWeaponPosition Positionx);
+
+	bool PickUpItemSuccess();
+
+	void InteractionKeyPressed();
+
+	void UpdateCharacterGunState();
+
+	void TakeBackKeyPressed();
+
+	void Keyboard1KeyPressed();
+
+	void Keyboard2KeyPressed();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = GameMode)
+		AItemWeapon* ReadyEquipWeapon;
 
 
 
@@ -297,6 +313,14 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = SocketNames)
 		FName BackpackName = "Socket_Backpack";
+
+	void TakeBackWeapon();
+
+	void EquipWeapon();
+
+	
+
+
 
 
 };
