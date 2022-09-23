@@ -16,6 +16,8 @@ class UMaterialInterface;
 class UMaterialInstanceDynamic;
 class UTexture;
 class APickUpBase;
+class APUBGA_PlayerState;
+class AItemWeapon;
 
 
 
@@ -90,7 +92,7 @@ protected:
 
 
 	UPROPERTY()
-		APUBGA_PlayerController* MyPlayerControllerRef;
+		APUBGA_PlayerController* PlayerControllerRef;
 
 	UFUNCTION(BlueprintCallable,Category=SkeletalMeshes)
 	void InitSkeletalMesh();
@@ -112,8 +114,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Meshes)
 		UTexture* SkinMatTest;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Meshes)
+		APUBGA_PlayerState* PlayerStateRef;
+
 	
-	
+
 
 private:
 
@@ -125,6 +130,21 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = CharacterState, meta = (AllowPrivateAccess = "true"))
 		bool bIsAiming = 0;
+
+	UFUNCTION(BlueprintCallable)
+		void UpdateWeaponDisplay(FName HoldSocket);
+
+	void Attach(AItemWeapon* WeaponToAttach, FName SocksName);
+
+	UFUNCTION(BlueprintCallable)
+		void UpdateEquipmentDisplay();
+
+	UFUNCTION(BlueprintCallable)
+		void ClearFashion();
+
+	UFUNCTION(BlueprintCallable)
+		void UpdateFashionDisplay();
+
 
 
 
@@ -169,7 +189,6 @@ public:
 		void MouseLookUp(float AxisValue);
 
 	
-
 
 
 };

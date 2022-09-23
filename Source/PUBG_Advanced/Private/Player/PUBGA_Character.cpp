@@ -12,6 +12,10 @@
 #include "PUBGA_Structs.h"
 #include "Engine/Texture.h"
 #include "Items/PickUpBase.h"
+#include "PlayerState/PUBGA_PlayerState.h"
+#include "Engine/SkeletalMeshSocket.h"
+#include "Items/ItemWeapon.h"
+#include "Items/ItemFashion.h"
 
 
 
@@ -64,6 +68,13 @@ void APUBGA_Character::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	if (Controller != nullptr) {
+		PlayerStateRef = Cast<APUBGA_PlayerState>(Controller->PlayerState);
+
+	}
+
+	
+
 
 }
 
@@ -99,7 +110,7 @@ void APUBGA_Character::PossessedBy(AController* inController) {
 
 	APUBGA_PlayerController* SPC = Cast<APUBGA_PlayerController>(inController);
 	if (SPC) {
-		MyPlayerControllerRef = SPC;
+		PlayerControllerRef = SPC;
 		SPC->OnPossessx1(this);
 
 	}
@@ -242,8 +253,146 @@ UTexture* APUBGA_Character::GetFashionDatasTexture(FName ID) {
 }
 
 
+void APUBGA_Character::UpdateWeaponDisplay(FName HoldSocket) {
+	if (!PlayerStateRef)return;
+	if (!PlayerControllerRef)return;
+	if (HoldSocket != "None") {
+		if (PlayerStateRef->GetHoldGun()) {
+			Attach(PlayerStateRef->GetHoldGun(), HoldSocket);
+
+		}
+	}
+	
+	bool bIsEquipBackpack = 0;
+	const auto Equipments = PlayerStateRef->GetEquipments();
+	if (Equipments!=nullptr) {
+		for (auto Equipment : Equipments) {
+			if (Equipment->ItemType == EItemType::EIT_Backpack) {
+				bIsEquipBackpack = 1;
+
+			}
+		}
+
+	}
+	if (PlayerStateRef->GetWeapon1()) {
+		if (bIsEquipBackpack) {
+			Attach(PlayerStateRef->GetWeapon1(), PlayerControllerRef->BackLeftBName);
+		}
+		else {
+			Attach(PlayerStateRef->GetWeapon1(), PlayerControllerRef->BackLeftNName);
+		}
+
+	}
+	if (PlayerStateRef->GetWeapon2()) {
+		if (bIsEquipBackpack) {
+			Attach(PlayerStateRef->GetWeapon2(), PlayerControllerRef->BackRightBName);
+		}
+		else {
+			Attach(PlayerStateRef->GetWeapon2(), PlayerControllerRef->BackRightNName);
+		}
+
+	}
 
 
 
 
+
+
+}
+
+void APUBGA_Character::Attach(AItemWeapon* WeaponToAttach, FName SocksName) {
+	
+	const USkeletalMeshSocket* GunSocket = GetMesh()->GetSocketByName(SocksName);
+	const FTransform SocketTransform = GunSocket->GetSocketTransform(GetMesh());
+	WeaponToAttach->SetActorTransform(SocketTransform);
+	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, EAttachmentRule::KeepRelative, true);
+	WeaponToAttach->AttachToComponent(GetMesh(), AttachmentRules, SocksName);
+
+}
+
+void APUBGA_Character::UpdateEquipmentDisplay() {
+	if (!PlayerStateRef)return;
+	if (!PlayerControllerRef)return;
+
+	bool bHasHelmet = 0;
+
+	const auto Equipments = PlayerStateRef->GetEquipments();
+	if (Equipments) {
+
+		for (auto Equipment : Equipments) {
+
+			switch (Equipment->ItemType) {
+			case EItemType::EIT_Weapon:
+				break;
+			case EItemType::EIT_Accessories:
+				break;
+			case EItemType::EIT_Ammo:
+				break;
+			case EItemType::EIT_Health:
+				break;
+			case EItemType::EIT_Boost:
+				break;
+			case EItemType::EIT_Helmet:
+				Attach(Equipment,PlayerControllerRef->HelmetName);
+				bHasHelmet = 1;
+				break;
+			case EItemType::EIT_Vest:
+				Attach(Equipment, PlayerControllerRef->VestName);
+
+				break;
+			case EItemType::EIT_Backpack:
+				Attach(Equipment, PlayerControllerRef->BackpackName);
+
+				break;
+			case EItemType::EIT_Fashion:
+				break;
+			case EItemType::EIT_MAX:
+				break;
+			default:
+				break;
+			}
+
+		}
+
+	}
+	if (bHasHelmet) {
+		SKM_Hair->SetVisibility(0,0);
+	}
+	else {
+		SKM_Hair->SetVisibility(1, 0);
+	}
+
+
+
+
+
+}
+
+void APUBGA_Character::ClearFashion() {
+	ReplaceSkeletalMesh(EFashionType::EFT_ClothTop,"0");
+	ReplaceSkeletalMesh(EFashionType::EFT_ClothBottom, "0");
+	ReplaceSkeletalMesh(EFashionType::EFT_Whole, "0");
+	ReplaceSkeletalMesh(EFashionType::EFT_Shoes, "0");
+
+
+}
+
+void APUBGA_Character::UpdateFashionDisplay() {
+	if (!PlayerStateRef)return;
+	
+	ClearFashion();
+	const auto Fashions = PlayerStateRef->GetFashions();
+	if (Fashions) {
+		for (auto Fashion : Fashions) {
+			AItemFashion* TempFashion = Cast<AItemFashion>(Fashion);
+			if (TempFashion) {
+				ReplaceSkeletalMesh(TempFashion->FashionType,TempFashion->ID);
+			}
+
+		}
+
+
+	}
+
+}
 

@@ -20,6 +20,8 @@ class PUBG_ADVANCED_API AItemFashion : public AItemBase
 public:
 	AItemFashion();
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
+		EFashionType FashionType;
 
 
 
@@ -32,9 +34,7 @@ protected:
 
 	FSTR_ItemFashion* Datas = nullptr;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
-		EFashionType FashionType;
-
+	
 
 
 	

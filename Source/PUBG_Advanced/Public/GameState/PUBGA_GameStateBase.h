@@ -14,4 +14,11 @@ class PUBG_ADVANCED_API APUBGA_GameStateBase : public AGameStateBase
 {
 	GENERATED_BODY()
 	
+public:
+
+	int32 LiveAmount;
+
+
+
+
 };

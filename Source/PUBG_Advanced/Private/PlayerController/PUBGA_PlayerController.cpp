@@ -6,6 +6,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "PUBGA_Structs.h"
+#include "Items/PickUpBase.h"
+
 
 
 APUBGA_PlayerController::APUBGA_PlayerController() {
@@ -596,7 +598,25 @@ void APUBGA_PlayerController::ReturnThreeIntegers(int32& HoldWeapon, int32& Post
 
 }
 
+FName APUBGA_PlayerController::CalculateHoldGunSocket() {
+	FName GunSocket;
+	if (MyCharacterRef->GetIsProne()) {
+		if (MoveForwardAxis == 0.f && MoveRightAxis == 0.f) {
+			GunSocket = GunProneIdleName;
 
+		}
+		else {
+			if (MoveRightAxis == 0.f) {
+				GunSocket = GunProneFBName;
+			}
+			else {
+				GunSocket = GunProneOtherName;
+			}
+		}
+	}
+
+	return GunSocket;
+}
 
 
 

@@ -9,7 +9,7 @@
 #include "PUBGA_PlayerController.generated.h"
 
 class APUBGA_Character;
-
+class APickUpBase;
 
 
 
@@ -180,8 +180,60 @@ protected:
 
 	UDataTable* WalkSpeedTableObject;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Items)
+		TArray<APickUpBase*> PickupItems;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Items)
+		TArray<APickUpBase*> ItemsInRange;
 
+	FName CalculateHoldGunSocket();
+
+public:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Backpack)
+		int32 DefaultCapacity = 50;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = SocketNames)
+		FName GunStandName = "Socket_Gun_Stand";
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = SocketNames)
+		FName GunAimName = "Socket_Gun_Aim";
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = SocketNames)
+		FName GunReloadName = "Socket_Gun_Reload";
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = SocketNames)
+		FName GunProneIdleName = "Socket_Gun_ProneIdle";
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = SocketNames)
+		FName GunProneFBName = "Socket_Gun_ProneFB";
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = SocketNames)
+		FName GunProneOtherName = "Socket_Gun_ProneOther";
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = SocketNames)
+		FName GunCrouchName = "Socket_Gun_Crouch";
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = SocketNames)
+		FName BackLeftNName = "Socket_BackLeft_Normal";
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = SocketNames)
+		FName BackRightNName = "Socket_BackRight_Normal";
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = SocketNames)
+		FName BackLeftBName = "Socket_BackLeft_Backpack";
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = SocketNames)
+		FName BackRightBName = "Socket_BackRight_Backpack";
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = SocketNames)
+		FName HelmetName = "Socket_Helmet";
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = SocketNames)
+		FName VestName = "Socket_Vest";
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = SocketNames)
+		FName BackpackName = "Socket_Backpack";
 
 
 };
