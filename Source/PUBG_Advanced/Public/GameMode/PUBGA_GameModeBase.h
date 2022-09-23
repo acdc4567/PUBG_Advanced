@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "PUBGA_GameModeBase.generated.h"
 
+class APickUpBase;
 /**
  * 
  */
@@ -15,6 +16,13 @@ class PUBG_ADVANCED_API APUBGA_GameModeBase : public AGameModeBase
 	GENERATED_BODY()
 public:
 	APUBGA_GameModeBase();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = GenerateItems)
+		TArray<APickUpBase* > GeneratedItems;
+
+	UFUNCTION(BlueprintCallable)
+		void GetGeneratedItems(TArray<APickUpBase*> Items);
+
 
 
 };

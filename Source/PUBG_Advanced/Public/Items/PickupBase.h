@@ -26,6 +26,8 @@ public:
 	FOnBoxBeginOverlapSign OnBoxBeginOverlapSign;
 	FOnBoxEndOverlapSign OnBoxEndOverlapSign;
 
+	void EnableOutline(bool bEnable);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -55,8 +57,10 @@ protected:
 	UFUNCTION()
 		void BoxOverlapEndHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-	void EnableOutline(bool bEnable);
 
+
+
+	
 	
 
 

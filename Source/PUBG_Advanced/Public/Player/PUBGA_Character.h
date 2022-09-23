@@ -91,7 +91,7 @@ protected:
 
 
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = PlayerControllers)
 		APUBGA_PlayerController* PlayerControllerRef;
 
 	UFUNCTION(BlueprintCallable,Category=SkeletalMeshes)
@@ -161,6 +161,8 @@ public:
 	FORCEINLINE float GetForwardValue() const { return ForwardValue; }
 
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+
+	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 	//Setters
 	void SetIsProne(const bool& Valuex);

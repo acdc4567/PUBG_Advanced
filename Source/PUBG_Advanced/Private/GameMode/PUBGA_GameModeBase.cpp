@@ -7,6 +7,7 @@
 #include "PlayerController/PUBGA_PlayerController.h"
 #include "PlayerState/PUBGA_PlayerState.h"
 #include "UI/PUBGA_HUD.h"
+#include "Items/PickUpBase.h"
 
 
 APUBGA_GameModeBase::APUBGA_GameModeBase() {
@@ -18,4 +19,11 @@ APUBGA_GameModeBase::APUBGA_GameModeBase() {
 
 
 
+}
+
+void APUBGA_GameModeBase::GetGeneratedItems(TArray<APickUpBase*> Items) {
+	if (!Items.IsEmpty()) {
+		GeneratedItems = Items;
+	}
+	
 }

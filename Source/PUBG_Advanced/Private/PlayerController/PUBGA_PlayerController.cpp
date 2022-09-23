@@ -8,8 +8,10 @@
 #include "PUBGA_Structs.h"
 #include "Items/PickUpBase.h"
 #include "PlayerState/PUBGA_PlayerState.h"
-
-
+#include "Kismet/GameplayStatics.h"
+#include "GameMode/PUBGA_GameModeBase.h"
+#include "Camera/CameraComponent.h"
+#include "Math/Vector.h"
 
 APUBGA_PlayerController::APUBGA_PlayerController() {
 	ProneTimeTablePath = TEXT("DataTable'/Game/_Blueprints/Datas/DT_ProneTimes.DT_ProneTimes'");
@@ -48,7 +50,11 @@ void APUBGA_PlayerController::BeginPlay() {
 	
 	}
 
-
+	GameModeRef = Cast<APUBGA_GameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (GameModeRef) {
+		PickupItems = GameModeRef->GeneratedItems;
+		SetPickupItems(PickupItems);
+	}
 
 }
 
@@ -98,7 +104,7 @@ void APUBGA_PlayerController::Tick(float DeltaTime) {
 		
 	}
 
-
+	TargetingItem();
 
 }
 
@@ -710,6 +716,104 @@ void APUBGA_PlayerController::Event_OnMontageEnded(UAnimMontage* Montage, bool b
 	if (!MyCharacterRef->GetCurrentMontage()) {
 		MyCharacterRef->SetIsPlayingMontage(0);
 	}
+
+
+}
+
+void APUBGA_PlayerController::SetPickupItems(TArray<APickUpBase*> Items) {
+	if (!Items.IsEmpty()) {
+		for (APickUpBase* PickupItem : Items) {
+			PickupItem->OnBoxBeginOverlapSign.AddUObject(this, &APUBGA_PlayerController::ExecBeginOverlap);
+			PickupItem->OnBoxEndOverlapSign.AddUObject(this, &APUBGA_PlayerController::ExecEndOverlap);
+		}
+
+
+	}
+
+
+
+}
+
+void APUBGA_PlayerController::ExecBeginOverlap(APickUpBase* PickupObject) {
+	
+	ItemsInRange.Add(PickupObject);
+
+
+}
+
+void APUBGA_PlayerController::ExecEndOverlap(APickUpBase* PickupObject) {
+	PickupObject->EnableOutline(0);
+	if (!ItemsInRange.IsEmpty()) {
+		int32 TempArrayIndex = 0;
+		bool bFound = ItemsInRange.Find(PickupObject, TempArrayIndex);
+		if (bFound) {
+			ItemsInRange.RemoveAt(TempArrayIndex);
+		}
+	}
+	
+
+}
+
+void APUBGA_PlayerController::OutlineItem(APickUpBase* Item) {
+
+	if (!ItemsInRange.IsEmpty()) {
+		for (APickUpBase* Itemx : ItemsInRange) {
+			if (Itemx == Item) {
+				Item->EnableOutline(1);
+			}
+			else {
+				Item->EnableOutline(0);
+			}
+		}
+
+
+	}
+
+
+
+}
+
+void APUBGA_PlayerController::TargetingItem() {
+	if (!MyCharacterRef)return;
+	double ShortestDistance = 10000.f;
+	APickUpBase* ShortestItem=nullptr;
+
+	if (!ItemsInRange.IsEmpty()) {
+		FCollisionQueryParams CollisionParams;
+		CollisionParams.AddIgnoredActor(this);
+		const FVector TraceStart = MyCharacterRef->GetFollowCamera()->GetComponentLocation();
+		const FVector ShootDirection = MyCharacterRef->GetFollowCamera()->GetForwardVector();
+		const FVector TraceEnd = TraceStart + ShootDirection * 450.f;
+		FHitResult HitResult;
+		GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility, CollisionParams);
+		
+		for (APickUpBase* ItemInRange : ItemsInRange) {
+			ItemInRange->EnableOutline(0);
+			double TempDist = FVector::Distance(HitResult.Location, ItemInRange->GetActorLocation());
+			if (TempDist <ShortestDistance) {
+				ShortestDistance = TempDist;
+				ShortestItem = ItemInRange;
+			}
+		
+		
+		}
+
+		if (ShortestItem) {
+			if (ShortestDistance<65.f) {
+				ShortestItem->EnableOutline(1);
+				ReadyPickupItem = ShortestItem;
+			}
+			else {
+				ReadyPickupItem = nullptr;
+			}
+			
+		}
+
+
+
+	}
+
+
 
 
 }

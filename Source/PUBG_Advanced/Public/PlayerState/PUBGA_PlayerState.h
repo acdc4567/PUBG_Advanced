@@ -119,7 +119,6 @@ public:
 
 	void SetWeapon2(AItemWeapon* WeaponToSet);
 
-	UFUNCTION(BlueprintCallable)
 	void SetHoldGun(AItemWeapon* WeaponToSet);
 
 	void SetAmmo556(int32 Value);
@@ -130,15 +129,13 @@ public:
 
 	void SetEnergyPoint(float Value);
 
-	UFUNCTION(BlueprintCallable)
-		void AddEquipment(AItemBase* Equipment);
+	void AddEquipment(AItemBase* Equipment);
 
 	void AddFashion(AItemBase* Fashion);
 
 	void AddItem(AItemBase* Item);
 
-	UFUNCTION(BlueprintCallable)
-		bool RemoveEquipment(AItemBase* Equipment);
+	bool RemoveEquipment(AItemBase* Equipment);
 
 	bool RemoveFashion(AItemBase* Fashion);
 

@@ -11,7 +11,7 @@
 class APUBGA_Character;
 class APickUpBase;
 class APUBGA_PlayerState;
-
+class APUBGA_GameModeBase;
 
 
 /**
@@ -209,6 +209,27 @@ protected:
 
 	UFUNCTION()
 		void Event_OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
+	void SetPickupItems(TArray<APickUpBase*> Items);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = GameMode)
+		APUBGA_GameModeBase* GameModeRef;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = GameMode)
+		TArray<APickUpBase*> GameModeGeneratedItems;
+
+	void ExecBeginOverlap(APickUpBase* PickupObject);
+
+	void ExecEndOverlap(APickUpBase* PickupObject);
+
+	void OutlineItem(APickUpBase* Item);
+
+	void TargetingItem();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = GameMode)
+		APickUpBase* ReadyPickupItem;
+
+
 
 
 
