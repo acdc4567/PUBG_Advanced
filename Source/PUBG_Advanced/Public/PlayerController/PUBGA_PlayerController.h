@@ -229,6 +229,24 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = GameMode)
 		APickUpBase* ReadyPickupItem;
 
+	EWeaponPosition AutoPosition(bool & bIsOnHand);
+
+	void AssignPosition(const EWeaponPosition& Assign, EWeaponPosition& Position,bool & bIsOnHand);
+
+	APickUpBase* SpawnPickupItems(AItemBase* ItemBase);
+
+	UFUNCTION(BlueprintCallable)
+		void SpawnPickUpItem( AItemBase* ItemBase, APickUpBase*& PU);
+
+	UFUNCTION(BlueprintCallable)
+		void DiscardWeapon(AItemWeapon* ItemWeapon);
+
+	FName GenerateSN();
+
+	void DiscardKeyPressed();
+
+
+
 
 
 

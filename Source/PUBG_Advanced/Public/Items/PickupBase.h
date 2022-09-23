@@ -10,7 +10,8 @@
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnBoxBeginOverlapSign,APickUpBase*);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnBoxEndOverlapSign, APickUpBase*);
 
-
+class UBoxComponent;
+class UWidgetComponent;
 /**
  * 
  */
@@ -28,6 +29,8 @@ public:
 
 	void EnableOutline(bool bEnable);
 
+	FORCEINLINE UBoxComponent* GetBox() const { return Box; }
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -36,13 +39,13 @@ protected:
 		UStaticMeshComponent* StaticMeshx1;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
-		class UWidgetComponent* UI;
+		UWidgetComponent* UI;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
 		UStaticMeshComponent* Outline;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
-		class UBoxComponent* Box;
+		UBoxComponent* Box;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
 		FName UI_Prefix;

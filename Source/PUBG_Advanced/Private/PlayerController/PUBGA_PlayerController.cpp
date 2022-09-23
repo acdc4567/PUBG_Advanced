@@ -12,6 +12,19 @@
 #include "GameMode/PUBGA_GameModeBase.h"
 #include "Camera/CameraComponent.h"
 #include "Math/Vector.h"
+#include "Items/ItemWeapon.h"
+#include "Items/PickUpWeapon.h"
+#include "Items/PickUpHealth.h"
+#include "Items/PickUpEquipment.h"
+#include "Items/PickUpFashion.h"
+#include "Items/PickUpBoost.h"
+#include "Items/PickUpAmmo.h"
+#include "Items/PickUpWeaponAcc.h"
+#include "Components/BoxComponent.h"
+#include "Items/ItemAmmo.h"
+#include "Items/ItemWeaponAcc.h"
+
+
 
 APUBGA_PlayerController::APUBGA_PlayerController() {
 	ProneTimeTablePath = TEXT("DataTable'/Game/_Blueprints/Datas/DT_ProneTimes.DT_ProneTimes'");
@@ -86,6 +99,7 @@ void APUBGA_PlayerController::SetupInputComponent() {
 	InputComponent->BindAction("Aim", IE_Pressed, this, &APUBGA_PlayerController::AimKeyPressed);
 	InputComponent->BindAction("Aim", IE_Released, this, &APUBGA_PlayerController::AimKeyReleased);
 
+	InputComponent->BindAction("DiscardWeapon", IE_Pressed, this, &APUBGA_PlayerController::DiscardKeyPressed);
 
 
 }
@@ -819,6 +833,375 @@ void APUBGA_PlayerController::TargetingItem() {
 }
 
 
+EWeaponPosition APUBGA_PlayerController::AutoPosition(bool& bIsOnHand) {
+	if (!PlayerStateRef)return EWeaponPosition::EWP_MAX;
+	int32 CurrentAmount = 0;
+	if (PlayerStateRef->GetWeapon1()) {
+		CurrentAmount += 1;
+	}
+	if (PlayerStateRef->GetWeapon2()) {
+		CurrentAmount += 1;
+	}
+	if (PlayerStateRef->GetHoldGun()) {
+		CurrentAmount += 1;
+	}
+	if (CurrentAmount == 0) {
+		bIsOnHand = 1;
+		return EWeaponPosition::EWP_Left;
+
+	}
+	else {
+		if (CurrentAmount < 2) {
+			if (PlayerStateRef->GetHoldGun()) {
+				switch (PlayerStateRef->GetHoldGun()->Position) {
+				case EWeaponPosition::EWP_Left:
+					bIsOnHand = 0;
+					return EWeaponPosition::EWP_Right;
+					break;
+				case EWeaponPosition::EWP_Right:
+					bIsOnHand = 0;
+					return EWeaponPosition::EWP_Left;
+					break;
+				case EWeaponPosition::EWP_MAX:
+					break;
+				default:
+					break;
+				}
+			}
+			else {
+				if (PlayerStateRef->GetWeapon1()) {
+					bIsOnHand = 0;
+					return EWeaponPosition::EWP_Right;
+
+				}
+				else {
+					bIsOnHand = 0;
+					return EWeaponPosition::EWP_Left;
+
+				}
+			}
+		}
+		else {
+			if (PlayerStateRef->GetHoldGun()) {
+				switch (PlayerStateRef->GetHoldGun()->Position) {
+				case EWeaponPosition::EWP_Left:
+					bIsOnHand = 1;
+					return EWeaponPosition::EWP_Left;
+
+					break;
+				case EWeaponPosition::EWP_Right:
+					bIsOnHand = 1;
+					return EWeaponPosition::EWP_Right;
+
+					break;
+				case EWeaponPosition::EWP_MAX:
+					break;
+				default:
+					break;
+				}
+			}
+			else {
+				bIsOnHand = 0;
+				return EWeaponPosition::EWP_Left;
+
+			}
+		}
+	}
+
+	return EWeaponPosition::EWP_MAX;
+
+}
+
+void APUBGA_PlayerController::AssignPosition(const EWeaponPosition& Assign, EWeaponPosition& Position, bool& bIsOnHand) {
+	if (!PlayerStateRef)return;
+	if (PlayerStateRef->GetHoldGun()) {
+		if (PlayerStateRef->GetHoldGun()->Position == Assign) {
+			Position = Assign;
+			bIsOnHand = 1;
+		}
+		else {
+			Position = Assign;
+			bIsOnHand = 0;
+		}
+	}
+	else {
+		Position = Assign;
+		bIsOnHand = 0;
+	}
+
+
+
+}
+
+APickUpBase* APUBGA_PlayerController::SpawnPickupItems(AItemBase* ItemBase) {
+	if (!MyCharacterRef)return nullptr;
+	if (!ItemBase)return nullptr;
+	APickUpBase* ReturnPUBase=nullptr;
+	FName IDx = ItemBase->ID;
+	FName SNx = ItemBase->SN;
+
+	FTransform Transformx;
+	Transformx.SetLocation(MyCharacterRef->GetActorLocation());
+	
+	APickUpBase* PUBase=nullptr;
+	APickUpWeapon* PUWeapon = nullptr;
+	APickUpWeaponAcc* PUWeaponAcc = nullptr;
+	APickUpAmmo* PUAmmo = nullptr;
+	APickUpHealth* PUHealth = nullptr;
+	APickUpBoost* PUBoost = nullptr;
+	APickUpEquipment* PUEquipment = nullptr;
+	APickUpFashion* PUFashion = nullptr;
+	AItemWeapon* ItemWeaponx = nullptr;
+
+	switch (ItemBase->ItemType) {
+	case EItemType::EIT_Weapon:
+		PUWeapon = GetWorld()->SpawnActorDeferred<APickUpWeapon>(APickUpWeapon::StaticClass(), Transformx);
+		if (PUWeapon) {
+			PUWeapon->ID = IDx;
+			PUWeapon->SN = SNx;
+			PUWeapon->Amount = 1;
+			ItemWeaponx = Cast<AItemWeapon>(ItemBase);
+			if (ItemWeaponx) {
+				PUWeapon->Ammo = ItemWeaponx->Ammo;
+			}
+			PUWeapon->FinishSpawning(Transformx);
+
+		}
+		PUBase = Cast<APickUpBase>(PUWeapon);
+		break;
+	case EItemType::EIT_Accessories:
+		PUWeaponAcc = GetWorld()->SpawnActorDeferred<APickUpWeaponAcc>(APickUpWeaponAcc::StaticClass(), Transformx);
+		if (PUWeaponAcc) {
+			PUWeaponAcc->ID = IDx;
+			PUWeaponAcc->SN = SNx;
+			PUWeaponAcc->Amount = 1;
+			PUWeaponAcc->FinishSpawning(Transformx);
+
+		}
+		PUBase = Cast<APickUpBase>(PUWeaponAcc);
+
+		break;
+	case EItemType::EIT_Ammo:
+		PUAmmo = GetWorld()->SpawnActorDeferred<APickUpAmmo>(APickUpAmmo::StaticClass(), Transformx);
+		if (PUAmmo) {
+			PUAmmo->ID = IDx;
+			PUAmmo->SN = SNx;
+			PUAmmo->Amount = ItemBase->Amount;
+			PUAmmo->FinishSpawning(Transformx);
+
+		}
+		PUBase = Cast<APickUpBase>(PUAmmo);
+		break;
+	case EItemType::EIT_Health:
+		PUHealth = GetWorld()->SpawnActorDeferred<APickUpHealth>(APickUpHealth::StaticClass(), Transformx);
+		if (PUHealth) {
+			PUHealth->ID = IDx;
+			PUHealth->SN = SNx;
+			PUHealth->Amount = ItemBase->Amount;
+			PUHealth->FinishSpawning(Transformx);
+
+		}
+		PUBase = Cast<APickUpBase>(PUHealth);
+		break;
+	case EItemType::EIT_Boost:
+		PUBoost = GetWorld()->SpawnActorDeferred<APickUpBoost>(APickUpBoost::StaticClass(), Transformx);
+		if (PUBoost) {
+			PUBoost->ID = IDx;
+			PUBoost->SN = SNx;
+			PUBoost->Amount = ItemBase->Amount;
+			PUBoost->FinishSpawning(Transformx);
+
+		}
+		PUBase = Cast<APickUpBase>(PUBoost);
+
+		break;
+	case EItemType::EIT_Helmet:
+		PUEquipment = GetWorld()->SpawnActorDeferred<APickUpEquipment>(APickUpEquipment::StaticClass(), Transformx);
+		if (PUEquipment) {
+			PUEquipment->ID = IDx;
+			PUEquipment->SN = SNx;
+			PUEquipment->Amount = 1;
+			PUEquipment->FinishSpawning(Transformx);
+
+		}
+		PUBase = Cast<APickUpBase>(PUEquipment);
+		break;
+	case EItemType::EIT_Vest:
+		PUEquipment = GetWorld()->SpawnActorDeferred<APickUpEquipment>(APickUpEquipment::StaticClass(), Transformx);
+		if (PUEquipment) {
+			PUEquipment->ID = IDx;
+			PUEquipment->SN = SNx;
+			PUEquipment->Amount = 1;
+			PUEquipment->FinishSpawning(Transformx);
+
+		}
+		PUBase = Cast<APickUpBase>(PUEquipment);
+		break;
+	case EItemType::EIT_Backpack:
+		PUEquipment = GetWorld()->SpawnActorDeferred<APickUpEquipment>(APickUpEquipment::StaticClass(), Transformx);
+		if (PUEquipment) {
+			PUEquipment->ID = IDx;
+			PUEquipment->SN = SNx;
+			PUEquipment->Amount = 1;
+			PUEquipment->FinishSpawning(Transformx);
+
+		}
+		PUBase = Cast<APickUpBase>(PUEquipment);
+		break;
+	case EItemType::EIT_Fashion:
+		PUFashion = GetWorld()->SpawnActorDeferred<APickUpFashion>(APickUpFashion::StaticClass(), Transformx);
+		if (PUFashion) {
+			PUFashion->ID = IDx;
+			PUFashion->SN = SNx;
+			PUFashion->Amount = 1;
+			PUFashion->FinishSpawning(Transformx);
+
+		}
+		PUBase = Cast<APickUpBase>(PUFashion);
+		break;
+	case EItemType::EIT_MAX:
+
+
+		break;
+	default:
+		break;
+	}
+	if (PUBase) {
+		PickupItems.Add(PUBase);
+		PUBase->OnBoxBeginOverlapSign.AddUObject(this,&APUBGA_PlayerController::ExecBeginOverlap);
+		PUBase->OnBoxEndOverlapSign.AddUObject(this, &APUBGA_PlayerController::ExecEndOverlap);
+	
+		PUBase->GetBox()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		PUBase->GetBox()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	
+	}
+	
+
+
+	return PUBase;
+}
+
+
+void APUBGA_PlayerController::SpawnPickUpItem( AItemBase* ItemBase, APickUpBase*& PU) {
+	PU=SpawnPickupItems(ItemBase);
+	
+}
+
+void APUBGA_PlayerController::DiscardWeapon(AItemWeapon* ItemWeapon) {
+	if (!ItemWeapon)return;
+	if (!PlayerStateRef)return;
+	if (ItemWeapon->Ammo > 0) {
+		AItemAmmo* PUAmmo = nullptr;
+		FTransform Transformx;
+		Transformx.SetLocation(FVector::ZeroVector);
+
+		PUAmmo = GetWorld()->SpawnActorDeferred<AItemAmmo>(AItemAmmo::StaticClass(), Transformx);
+		if (PUAmmo) {
+			PUAmmo->ID = ItemWeapon->Datas->UseAmmoID;
+			PUAmmo->SN = GenerateSN();
+			PUAmmo->Amount = ItemWeapon->Ammo;
+			PUAmmo->FinishSpawning(Transformx);
+
+		}
+		AItemBase* IBItem = Cast<AItemBase>(PUAmmo);
+		if (IBItem) {
+			APickUpBase* TempPUBase = nullptr;
+			SpawnPickUpItem(IBItem, TempPUBase);
+			ItemWeapon->Ammo = 0;
+		}
+	}
+	APickUpBase* TempPUWeapon = nullptr;
+	AItemBase* IBWeapon = Cast<AItemBase>(ItemWeapon);
+	SpawnPickUpItem(IBWeapon, TempPUWeapon);
+	APickUpBase* TempPUWeaponAcc = nullptr;
+	if (ItemWeapon->AccSightObj) {
+		AItemBase* IBSightAcc = Cast<AItemBase>(ItemWeapon->AccSightObj);
+		SpawnPickUpItem(IBSightAcc, TempPUWeaponAcc);
+		ItemWeapon->AccSightObj->Destroy();
+	}
+	if (ItemWeapon->AccForegripObj) {
+		AItemBase* IBForegripAcc = Cast<AItemBase>(ItemWeapon->AccForegripObj);
+
+		SpawnPickUpItem(IBForegripAcc, TempPUWeaponAcc);
+		ItemWeapon->AccForegripObj->Destroy();
+	}
+	if (ItemWeapon->AccMagObj) {
+		AItemBase* IBMagAcc = Cast<AItemBase>(ItemWeapon->AccMagObj);
+
+		SpawnPickUpItem(IBMagAcc, TempPUWeaponAcc);
+		ItemWeapon->AccMagObj->Destroy();
+	}
+	if (ItemWeapon->AccMuzzleObj) {
+		AItemBase* IBMuzzleAcc = Cast<AItemBase>(ItemWeapon->AccMuzzleObj);
+
+		SpawnPickUpItem(IBMuzzleAcc, TempPUWeaponAcc);
+		ItemWeapon->AccMuzzleObj->Destroy();
+	}
+	if (ItemWeapon->AccButtstockObj) {
+		AItemBase* IBButtstockAcc = Cast<AItemBase>(ItemWeapon->AccButtstockObj);
+
+		SpawnPickUpItem(IBButtstockAcc, TempPUWeaponAcc);
+		ItemWeapon->AccButtstockObj->Destroy();
+	}
+
+	if (ItemWeapon->bIsOnHand) {
+		PlayerStateRef->SetHoldGun(nullptr);
+	}
+	else {
+		switch (ItemWeapon->Position) {
+		case EWeaponPosition::EWP_Left:
+			PlayerStateRef->SetWeapon1(nullptr);
+			break;
+		case EWeaponPosition::EWP_Right:
+			PlayerStateRef->SetWeapon2(nullptr);
+			break;
+		case EWeaponPosition::EWP_MAX:
+
+			break;
+		default:
+			break;
+		}
+	}
+	ItemWeapon->Destroy();
+
+
+}
+
+
+FName APUBGA_PlayerController::GenerateSN() {
+	float RandomFloat1 = FMath::RandRange(-1000.f,1000.f);
+	float RandomFloat2 = FMath::RandRange(-1000.f, 1000.f);
+	FString RandFloat1 = FString::SanitizeFloat(RandomFloat1);
+	FString RandFloat2 = FString::SanitizeFloat(RandomFloat2);
+	FString RandFloat3 = RandFloat1.Append(RandFloat2);
+	return FName(*RandFloat3);
+
+}
+
+void APUBGA_PlayerController::DiscardKeyPressed() {
+	if (!MyCharacterRef)return;
+	if (!PlayerStateRef)return;
+	if (!MyCharacterRef->GetIsProne()) {
+		if (!MyCharacterRef->GetIsPlayingMontage()) {
+			if (PlayerStateRef->GetHoldGun()) {
+				DiscardWeapon(PlayerStateRef->GetHoldGun());
+			}
+			else {
+				if (PlayerStateRef->GetWeapon1()) {
+					DiscardWeapon(PlayerStateRef->GetWeapon1());
+				}
+				else {
+					if (PlayerStateRef->GetWeapon2()) {
+						DiscardWeapon(PlayerStateRef->GetWeapon2());
+					}
+				}
+			}
+		}
+	}
+
+
+
+}
 
 
 

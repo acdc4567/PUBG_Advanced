@@ -34,6 +34,22 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Publics, meta = (ExposeOnSpawn = "true"))
 		bool bIsOnHand;
 
+	FSTR_ItemWeapon* Datas = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
+		AItemWeaponAcc* AccMagObj;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
+		AItemWeaponAcc* AccMuzzleObj;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
+		AItemWeaponAcc* AccSightObj;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
+		AItemWeaponAcc* AccForegripObj;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
+		AItemWeaponAcc* AccButtstockObj;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
@@ -74,23 +90,7 @@ protected:
 
 	virtual void OnConstruction(const FTransform& Transform) override;
 
-	FSTR_ItemWeapon* Datas = nullptr;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
-		AItemWeaponAcc* AccMagObj;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
-		AItemWeaponAcc* AccMuzzleObj;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
-		AItemWeaponAcc* AccSightObj;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
-		AItemWeaponAcc* AccForegripObj;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
-		AItemWeaponAcc* AccButtstockObj;
-
+	
 
 	UFUNCTION(BlueprintCallable)
 	void UpdateMag(AItemWeaponAcc* MagAccActor);

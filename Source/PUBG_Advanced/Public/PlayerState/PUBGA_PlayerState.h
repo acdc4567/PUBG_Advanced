@@ -119,7 +119,8 @@ public:
 
 	void SetWeapon2(AItemWeapon* WeaponToSet);
 
-	void SetHoldGun(AItemWeapon* WeaponToSet);
+	UFUNCTION(BlueprintCallable)
+		void SetHoldGun(AItemWeapon* WeaponToSet);
 
 	void SetAmmo556(int32 Value);
 
