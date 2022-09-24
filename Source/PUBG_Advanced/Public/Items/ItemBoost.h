@@ -21,7 +21,7 @@ class PUBG_ADVANCED_API AItemBoost : public AItemUseBase
 public:
 	AItemBoost();
 
-
+	virtual int32 GetWeight() override;
 protected:
 	FString ItemBoostTablePath;
 
@@ -32,7 +32,7 @@ protected:
 	FSTR_ItemBoost* Datas = nullptr;
 
 
-	virtual int32 GetWeight() override;
+	
 
 	
 };

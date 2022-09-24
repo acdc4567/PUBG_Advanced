@@ -21,6 +21,7 @@ class PUBG_ADVANCED_API AItemHealth : public AItemUseBase
 public:
 	AItemHealth();
 
+	virtual int32 GetWeight() override;
 protected:
 	FString ItemHealthTablePath;
 
@@ -31,7 +32,7 @@ protected:
 	FSTR_ItemHealth* Datas = nullptr;
 
 
-	virtual int32 GetWeight() override;
+	
 
 	
 };

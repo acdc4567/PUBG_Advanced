@@ -23,6 +23,8 @@ public:
 
 	FSTR_ItemWeaponAcc* Datas = nullptr;
 
+	virtual int32 GetWeight() override;
+
 protected:
 
 	
@@ -37,8 +39,7 @@ protected:
 
 	virtual void OnConstruction(const FTransform& Transform) override;
 
-	virtual int32 GetWeight() override;
-
+	
 
 
 

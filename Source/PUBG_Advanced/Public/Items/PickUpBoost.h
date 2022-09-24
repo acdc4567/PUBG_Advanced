@@ -24,6 +24,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Publics)
 		int32 SingleWeight;
 
+	virtual int32 GetWeight() override;
+
 protected:
 
 
@@ -34,8 +36,7 @@ protected:
 
 	virtual void OnConstruction(const FTransform& Transform) override;
 
-	virtual int32 GetWeight() override;
-
+	
 
 
 

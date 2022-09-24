@@ -32,6 +32,9 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	FName GenerateSN();
+
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -208,6 +211,17 @@ protected:
 		void Event_FashionChanged(AItemBase* Fashion, bool bIsAdd);
 
 	UFUNCTION()
+		void Event_ItemsChanged(AItemBase* Item, bool bIsAdd);
+
+	UFUNCTION()
+		void Event_AmmoChanged(bool bIsTrue);
+
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void Event_ItemsChanges();
+
+
+	UFUNCTION()
 		void Event_OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
 	void SetPickupItems(TArray<APickUpBase*> Items);
@@ -241,7 +255,7 @@ protected:
 	UFUNCTION(BlueprintCallable)
 		void DiscardWeapon(AItemWeapon* ItemWeapon);
 
-	FName GenerateSN();
+	
 
 	void DiscardKeyPressed();
 
@@ -262,6 +276,18 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = GameMode)
 		AItemWeapon* ReadyEquipWeapon;
 
+	bool PickupGoods(APickUpBase* PUItem);
+
+	UFUNCTION(BlueprintCallable)
+		void DiscardItem(AItemBase* IBItem);
+
+
+
+
+
+
+
+
 
 
 
@@ -269,7 +295,7 @@ protected:
 
 public:
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Backpack)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Backpack)
 		int32 DefaultCapacity = 50;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = SocketNames)

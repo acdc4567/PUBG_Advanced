@@ -20,7 +20,7 @@ class PUBG_ADVANCED_API AItemAmmo : public AItemBase
 public:
 	AItemAmmo();
 
-
+	virtual int32 GetWeight() override;
 
 
 
@@ -38,7 +38,7 @@ protected:
 
 	FSTR_ItemAmmo* Datas = nullptr;
 
-	virtual int32 GetWeight() override;
+	
 
 
 

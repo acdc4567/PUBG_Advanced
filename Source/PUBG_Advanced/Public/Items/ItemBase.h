@@ -44,7 +44,7 @@ public:
 		FName Name;
 
 
-
+	virtual int32 GetWeight();
 
 
 protected:
@@ -62,7 +62,7 @@ protected:
 
 	void Init(EItemType ItemTypex,FName Namex);
 
-	virtual int32 GetWeight();
+	
 
 	void UpdateAmount(const bool& bAdd, const bool& bReduce, const int32& Amountx);
 

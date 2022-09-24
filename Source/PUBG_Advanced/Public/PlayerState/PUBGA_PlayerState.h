@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
 #include "PUBGA_Enums.h"
+#include "Engine/DataTable.h"
 #include "PUBGA_PlayerState.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnWeaponChangedSignature, AItemWeapon*, Weapon, EWeaponPosition, Position, bool, bIsOnHand);
@@ -19,6 +20,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemsChangedSignature, AItemBase
 class APickUpBase;
 class AItemWeapon;
 class AItemBase;
+class APUBGA_PlayerController;
 
 
 /**
@@ -36,6 +38,10 @@ public:
 
 
 protected:
+
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Items)
 		AItemWeapon* Weapon1;
@@ -69,6 +75,14 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Items)
 		int32 KillAmount;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Items)
+		APUBGA_PlayerController* PlayerControllerRef;
+
+	FString ItemEquipmentTablePath;
+
+	UDataTable* ItemEquipmentTableObject;
+
 
 
 
@@ -111,7 +125,8 @@ public:
 
 	TArray<AItemBase*> GetFashions();
 
-	TArray<AItemBase*> GetItems();
+	UFUNCTION(BlueprintCallable)
+		TArray<AItemBase*> GetItems();
 
 	//Setters
 
@@ -142,6 +157,12 @@ public:
 
 	bool RemoveItem(AItemBase* Item);
 
+	bool CheckBackpackCapacity(int32 AddWeight);
 
+	void UpdateAmmoObject();
+
+	void UpdateAmmoAmount(FName IDx,bool bAdd,int32 Amountx);
+
+	bool CheckReplaceBackpack(AItemBase* Item);
 
 };

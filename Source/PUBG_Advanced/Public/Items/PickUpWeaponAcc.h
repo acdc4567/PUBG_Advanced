@@ -23,6 +23,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Publics)
 		EWeaponAccType AccType;
 
+	virtual int32 GetWeight() override;
 
 protected:
 
@@ -37,8 +38,7 @@ protected:
 
 	virtual void OnConstruction(const FTransform& Transform) override;
 
-	virtual int32 GetWeight() override;
-
+	
 
 
 

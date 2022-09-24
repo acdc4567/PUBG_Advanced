@@ -23,6 +23,8 @@
 #include "Components/BoxComponent.h"
 #include "Items/ItemAmmo.h"
 #include "Items/ItemWeaponAcc.h"
+#include "Items/ItemHealth.h"
+#include "Items/ItemBoost.h"
 
 
 
@@ -58,6 +60,10 @@ void APUBGA_PlayerController::BeginPlay() {
 	
 		PlayerStateRef->OnFashionChanged.AddDynamic(this, &APUBGA_PlayerController::Event_FashionChanged);
 		
+		PlayerStateRef->OnItemsChanged.AddDynamic(this, &APUBGA_PlayerController::Event_ItemsChanged);
+
+		PlayerStateRef->OnAmmoChanged.AddDynamic(this, &APUBGA_PlayerController::Event_AmmoChanged);
+
 		MyCharacterRef->GetMesh()->GetAnimInstance()->OnMontageEnded.AddDynamic(this,&APUBGA_PlayerController::Event_OnMontageEnded);
 	
 	
@@ -523,13 +529,12 @@ void APUBGA_PlayerController::RunKeyReleased() {
 }
 
 void APUBGA_PlayerController::UpdateWalkSpeed() {
-
+	if (!PlayerStateRef)return;
 	int32 HoldWeaponx, Posturex, MoveStatex;
 
 	ReturnThreeIntegers(HoldWeaponx, Posturex, MoveStatex);
 	FSTR_WalkSpeed* WalkSpeedRow = nullptr;
 
-	//UE_LOG(LogTemp, Warning, TEXT("% d, % d, % d"), HoldWeaponx, Posturex, MoveStatex);
 	
 	/*
 	false,true
@@ -627,7 +632,9 @@ void APUBGA_PlayerController::UpdateWalkSpeed() {
 		}
 	}
 
-
+	if (PlayerStateRef->GetHoldGun()) {
+		WalkSpeed*= PlayerStateRef->GetHoldGun()->Datas->WalkSpeedPer;
+	}
 
 
 
@@ -731,6 +738,15 @@ void APUBGA_PlayerController::Event_FashionChanged(AItemBase* Fashion, bool bIsA
 	if (!MyCharacterRef)return;
 	MyCharacterRef->UpdateFashionDisplay();
 
+}
+
+void APUBGA_PlayerController::Event_ItemsChanged(AItemBase* Item, bool bIsAdd) {
+	Event_ItemsChanges();
+
+}
+
+void APUBGA_PlayerController::Event_AmmoChanged(bool bIsTrue) {
+	Event_ItemsChanges();
 }
 
 void APUBGA_PlayerController::Event_OnMontageEnded(UAnimMontage* Montage, bool bInterrupted) {
@@ -994,7 +1010,7 @@ APickUpBase* APUBGA_PlayerController::SpawnPickupItems(AItemBase* ItemBase) {
 		if (PUAmmo) {
 			PUAmmo->ID = IDx;
 			PUAmmo->SN = SNx;
-			PUAmmo->Amount = ItemBase->Amount;
+			PUAmmo->Amount =ItemBase->Amount;
 			PUAmmo->FinishSpawning(Transformx);
 
 		}
@@ -1291,6 +1307,7 @@ bool APUBGA_PlayerController::PickUpItemSuccess() {
 		APickUpWeapon* TempPUWeapon = nullptr;
 		bool bAssignPos = 0;
 		EWeaponPosition WPNPos = EWeaponPosition::EWP_Left;
+		bool bPickUpGoodsSuccess = 0;
 		switch (ReadyPickupItem->ItemType) {
 		case EItemType::EIT_Weapon:
 			TempPUWeapon = Cast<APickUpWeapon>(ReadyPickupItem);
@@ -1302,10 +1319,25 @@ bool APUBGA_PlayerController::PickUpItemSuccess() {
 			break;
 		case EItemType::EIT_Accessories:
 
-
+			bPickUpGoodsSuccess = PickupGoods(ReadyPickupItem);
+			if (bPickUpGoodsSuccess) {
+				ReadyPickupItem->Destroy();
+				return 1;
+			}
+			else {
+				return 0;
+			}
 			break;
 		case EItemType::EIT_Ammo:
-
+			
+			bPickUpGoodsSuccess = PickupGoods(ReadyPickupItem);
+			if (bPickUpGoodsSuccess) {
+				ReadyPickupItem->Destroy();
+				return 1;
+			}
+			else {
+				return 0;
+			}
 
 			break;
 		case EItemType::EIT_Health:
@@ -1432,6 +1464,126 @@ void APUBGA_PlayerController::Keyboard2KeyPressed() {
 			MyCharacterRef->PlayMontage(EMontageType::EMT_Equip);
 		}
 	}
+}
+
+bool APUBGA_PlayerController::PickupGoods(APickUpBase* PUItem) {
+	if (!PlayerStateRef)return 0;
+	if (!PUItem)return 0;
+	if(PlayerStateRef->CheckBackpackCapacity(PUItem->GetWeight())) {
+		FTransform Transformx;
+		Transformx.SetLocation(FVector::ZeroVector);
+		AItemWeaponAcc* IBWeaponAcc = nullptr;
+		AItemHealth* IBHealth = nullptr;
+		AItemBoost* IBBoost = nullptr;
+
+		AItemBase* CastToIB = nullptr;
+
+		switch (PUItem->ItemType) {
+		case EItemType::EIT_Weapon:
+
+
+			break;
+		case EItemType::EIT_Accessories:
+			
+			IBWeaponAcc= GetWorld()->SpawnActorDeferred<AItemWeaponAcc>(AItemWeaponAcc::StaticClass(), Transformx);
+			if (IBWeaponAcc) {
+				IBWeaponAcc->ID = PUItem->ID;
+				IBWeaponAcc->SN = PUItem->SN;
+				IBWeaponAcc->Amount = 1;
+				IBWeaponAcc->FinishSpawning(Transformx);
+				CastToIB = Cast<AItemBase>(IBWeaponAcc);
+				if (CastToIB) {
+					PlayerStateRef->AddItem(CastToIB);
+				}
+			}
+			break;
+		case EItemType::EIT_Ammo:
+			PlayerStateRef->UpdateAmmoAmount(PUItem->ID,1,PUItem->Amount);
+
+			break;
+		case EItemType::EIT_Health:
+			IBHealth = GetWorld()->SpawnActorDeferred<AItemHealth>(AItemHealth::StaticClass(), Transformx);
+			if (IBHealth) {
+				IBHealth->ID = PUItem->ID;
+				IBHealth->SN = PUItem->SN;
+				IBHealth->Amount = PUItem->Amount;
+				IBHealth->FinishSpawning(Transformx);
+				CastToIB = Cast<AItemBase>(IBHealth);
+				if (CastToIB) {
+					PlayerStateRef->AddItem(CastToIB);
+				}
+			}
+
+			break;
+		case EItemType::EIT_Boost:
+			IBBoost = GetWorld()->SpawnActorDeferred<AItemBoost>(AItemBoost::StaticClass(), Transformx);
+			if (IBBoost) {
+				IBBoost->ID = PUItem->ID;
+				IBBoost->SN = PUItem->SN;
+				IBBoost->Amount = PUItem->Amount;
+				IBBoost->FinishSpawning(Transformx);
+				CastToIB = Cast<AItemBase>(IBBoost);
+				if (CastToIB) {
+					PlayerStateRef->AddItem(CastToIB);
+				}
+			}
+
+			break;
+		case EItemType::EIT_Helmet:
+
+
+			break;
+		case EItemType::EIT_Vest:
+
+
+			break;
+		case EItemType::EIT_Backpack:
+
+
+			break;
+		case EItemType::EIT_Fashion:
+
+
+			break;
+		case EItemType::EIT_MAX:
+
+
+			break;
+		default:
+			break;
+		}
+
+		return 1;
+
+
+
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("Backpack Full !!"));
+		return 0;
+	}
+
+
+
+
+	return 0;
+}
+
+void APUBGA_PlayerController::DiscardItem(AItemBase* IBItem) {
+	if (!PlayerStateRef)return;
+	APickUpBase* PUItem = nullptr;
+	PUItem	=SpawnPickupItems(IBItem);
+	if (IBItem->ItemType==EItemType::EIT_Ammo) {
+		PlayerStateRef->UpdateAmmoAmount(PUItem->ID,0,0);
+	}
+	bool bRemoved=PlayerStateRef->RemoveItem(IBItem);
+	if (IBItem) {
+		IBItem->Destroy();
+	}
+
+
+
+
 }
 
 void APUBGA_PlayerController::EquipWeapon() {
