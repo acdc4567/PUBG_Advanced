@@ -25,6 +25,8 @@
 #include "Items/ItemWeaponAcc.h"
 #include "Items/ItemHealth.h"
 #include "Items/ItemBoost.h"
+#include "Items/ItemEquipment.h"
+#include "Items/ItemFashion.h"
 
 
 
@@ -1302,18 +1304,19 @@ void APUBGA_PlayerController::PickupWeapon(APickUpWeapon* PickupWeaponx, bool bI
 }
 
 bool APUBGA_PlayerController::PickUpItemSuccess() {
-	
+
 	if (ReadyPickupItem) {
 		APickUpWeapon* TempPUWeapon = nullptr;
 		bool bAssignPos = 0;
 		EWeaponPosition WPNPos = EWeaponPosition::EWP_Left;
 		bool bPickUpGoodsSuccess = 0;
+		bool bPickUpEquipmentSuccess = 0;
 		switch (ReadyPickupItem->ItemType) {
 		case EItemType::EIT_Weapon:
 			TempPUWeapon = Cast<APickUpWeapon>(ReadyPickupItem);
-			bAssignPos=0;
-			WPNPos=EWeaponPosition::EWP_Left;
-			PickupWeapon(TempPUWeapon,bAssignPos,WPNPos);
+			bAssignPos = 0;
+			WPNPos = EWeaponPosition::EWP_Left;
+			PickupWeapon(TempPUWeapon, bAssignPos, WPNPos);
 			ReadyPickupItem->Destroy();
 			return 1;
 			break;
@@ -1329,7 +1332,7 @@ bool APUBGA_PlayerController::PickUpItemSuccess() {
 			}
 			break;
 		case EItemType::EIT_Ammo:
-			
+
 			bPickUpGoodsSuccess = PickupGoods(ReadyPickupItem);
 			if (bPickUpGoodsSuccess) {
 				ReadyPickupItem->Destroy();
@@ -1341,28 +1344,65 @@ bool APUBGA_PlayerController::PickUpItemSuccess() {
 
 			break;
 		case EItemType::EIT_Health:
+			bPickUpGoodsSuccess = PickupGoods(ReadyPickupItem);
+			if (bPickUpGoodsSuccess) {
+				ReadyPickupItem->Destroy();
+				return 1;
+			}
+			else {
+				return 0;
+			}
 
 
 			break;
 		case EItemType::EIT_Boost:
+			bPickUpGoodsSuccess = PickupGoods(ReadyPickupItem);
+			if (bPickUpGoodsSuccess) {
+				ReadyPickupItem->Destroy();
+				return 1;
+			}
+			else {
+				return 0;
+			}
 
 
 			break;
 		case EItemType::EIT_Helmet:
-
+			bPickUpEquipmentSuccess = PickupEquipment(ReadyPickupItem);
+			if (bPickUpEquipmentSuccess) {
+				ReadyPickupItem->Destroy();
+				return 1;
+			}
+			else {
+				return 0;
+			}
 
 			break;
 		case EItemType::EIT_Vest:
-
+			bPickUpEquipmentSuccess = PickupEquipment(ReadyPickupItem);
+			if (bPickUpEquipmentSuccess) {
+				ReadyPickupItem->Destroy();
+				return 1;
+			}
+			else {
+				return 0;
+			}
 
 			break;
 		case EItemType::EIT_Backpack:
-
+			bPickUpEquipmentSuccess = PickupEquipment(ReadyPickupItem);
+			if (bPickUpEquipmentSuccess) {
+				ReadyPickupItem->Destroy();
+				return 1;
+			}
+			else {
+				return 0;
+			}
 
 			break;
 		case EItemType::EIT_Fashion:
-
-
+			PickupFashion(ReadyPickupItem);
+			ReadyPickupItem->Destroy();
 			break;
 		case EItemType::EIT_MAX:
 
@@ -1377,8 +1417,8 @@ bool APUBGA_PlayerController::PickUpItemSuccess() {
 	else {
 		return 0;
 	}
-	
-	
+
+
 	return 0;
 }
 
@@ -1585,6 +1625,136 @@ void APUBGA_PlayerController::DiscardItem(AItemBase* IBItem) {
 
 
 }
+
+bool APUBGA_PlayerController::DiscardEquipment(AItemBase* IBItem, bool bIsCheck) {
+	if (!PlayerStateRef)return 0;
+	if (bIsCheck) {
+		if (IBItem->ItemType == EItemType::EIT_Backpack) {
+			if (PlayerStateRef->CheckReplaceBackpack(nullptr)) {
+
+			}
+			else {
+				UE_LOG(LogTemp, Warning, TEXT("Cannot Discard Backpack"));
+				return 0;
+			}
+		}
+	}
+	
+	APickUpBase* PUItemx = SpawnPickupItems(IBItem);
+	bool bSuccess= PlayerStateRef->RemoveEquipment(IBItem);
+	IBItem->Destroy();
+
+	return 1;
+}
+
+bool APUBGA_PlayerController::PickupEquipment(AItemBase* IBItem) {
+	if (!PlayerStateRef)return 0;
+	if (IBItem->ItemType == EItemType::EIT_Backpack) {
+		bool bSuccess = PlayerStateRef->CheckReplaceBackpack(IBItem);
+		if (bSuccess) {
+
+		}
+		else {
+			UE_LOG(LogTemp, Warning, TEXT("Backpack Capacity is not enough"));
+			return 0;
+		}
+	}
+	TArray<AItemBase* > IBEquipments = PlayerStateRef->GetEquipments();
+	AItemBase* CurrentItem = nullptr;
+	for (AItemBase* IBEquipment:IBEquipments) {
+		if (IBEquipment->ItemType==IBItem->ItemType) {
+			CurrentItem = IBEquipment;
+		}
+	}
+	if (CurrentItem) {
+		bool bSuccessx1= DiscardEquipment(CurrentItem,0);
+	}
+	AItemEquipment* IBEquipment = nullptr;
+	AItemBase* IBEquipmentCastToIB = nullptr;
+	FTransform Transformx;
+	Transformx.SetLocation(FVector::ZeroVector);
+	IBEquipment = GetWorld()->SpawnActorDeferred<AItemEquipment>(AItemEquipment::StaticClass(), Transformx);
+	if (IBEquipment) {
+		IBEquipment->ID = IBItem->ID;
+		IBEquipment->SN = IBItem->SN;
+		IBEquipment->Amount = IBItem->Amount;
+		IBEquipment->FinishSpawning(Transformx);
+
+		IBEquipmentCastToIB = Cast<AItemBase>(IBEquipment);
+		if (IBEquipmentCastToIB) {
+			PlayerStateRef->AddEquipment(IBEquipmentCastToIB);
+		}
+	}
+
+
+
+
+	return 1;
+}
+
+void APUBGA_PlayerController::DiscardFashion(AItemBase* IBItem) {
+	if (!PlayerStateRef)return;
+	APickUpBase* PUItemx = SpawnPickupItems(IBItem);
+	bool bRemoved=PlayerStateRef->RemoveFashion(IBItem);
+	IBItem->Destroy();
+
+}
+
+void APUBGA_PlayerController::PickupFashion(APickUpBase* PUItem) {
+	if (!PlayerStateRef)return;
+
+	APickUpFashion* PUItemx1 = Cast<APickUpFashion>(PUItem);
+
+	TArray<AItemBase*> FashionsDisplayed = PlayerStateRef->GetFashions();
+
+	TArray<AItemBase*> ReplacedItems;
+
+	for (AItemBase* FashionDisplay : FashionsDisplayed) {
+		AItemFashion* FashionDisplayx1 = Cast<AItemFashion>(FashionDisplay);
+		if (FashionDisplayx1 && PUItemx1) {
+			bool bCondition1 = FashionDisplayx1->FashionType == PUItemx1->FashionType;
+			bool bCondition2 = FashionDisplayx1->FashionType == EFashionType::EFT_Whole && (PUItemx1->FashionType == EFashionType::EFT_ClothTop || PUItemx1->FashionType == EFashionType::EFT_ClothBottom);
+			bool bCondition3 = (FashionDisplayx1->FashionType == EFashionType::EFT_ClothTop || FashionDisplayx1->FashionType == EFashionType::EFT_ClothBottom) && PUItemx1->FashionType == EFashionType::EFT_Whole;
+			if (bCondition1|| bCondition2 || bCondition3 ) {
+				ReplacedItems.Add(FashionDisplay);
+			}
+
+
+
+		}
+
+	}
+
+	for (AItemBase* ReplacedItem : ReplacedItems) {
+		DiscardFashion(ReplacedItem);
+
+	}
+	FTransform Transformx;
+	Transformx.SetLocation(FVector::ZeroVector);
+	AItemFashion* IBFashion = nullptr;
+	AItemBase* IBFashionCastToIB = nullptr;
+
+	IBFashion = GetWorld()->SpawnActorDeferred<AItemFashion>(AItemFashion::StaticClass(), Transformx);
+	if (IBFashion) {
+		IBFashion->ID = PUItem->ID;
+		IBFashion->SN = PUItem->SN;
+		IBFashion->Amount = PUItem->Amount;
+		IBFashion->FinishSpawning(Transformx);
+		IBFashionCastToIB = Cast<AItemBase>(IBFashion);
+		if (IBFashionCastToIB) {
+			PlayerStateRef->AddFashion(IBFashionCastToIB);
+		}
+	}
+
+
+
+}
+
+
+
+
+
+
 
 void APUBGA_PlayerController::EquipWeapon() {
 	if (!MyCharacterRef)return;

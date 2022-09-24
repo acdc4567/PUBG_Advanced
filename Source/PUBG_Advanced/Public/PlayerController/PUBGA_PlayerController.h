@@ -281,13 +281,13 @@ protected:
 	UFUNCTION(BlueprintCallable)
 		void DiscardItem(AItemBase* IBItem);
 
+	bool DiscardEquipment(AItemBase* IBItem, bool bIsCheck);
 
+	bool PickupEquipment(AItemBase* IBItem);
 
+	void DiscardFashion(AItemBase* IBItem);
 
-
-
-
-
+	void PickupFashion(APickUpBase* PUItem);
 
 
 

@@ -378,8 +378,8 @@ bool APUBGA_PlayerState::CheckReplaceBackpack(AItemBase* Item) {
 	if (!PlayerControllerRef)return 0;
 	int32 ItemsWeight=0;
 	int32 PickupCapacity = 0;
-	TArray<AItemBase*> ItemsInBackpack = GetItems();
-	for (AItemBase* Itemx : ItemsInBackpack) {
+	TArray<AItemBase*> ItemsInBackpackx = GetItems();
+	for (AItemBase* Itemx : ItemsInBackpackx) {
 		ItemsWeight += Itemx->GetWeight();
 	}
 	if (Item) {
