@@ -341,8 +341,8 @@ void APUBGA_PlayerState::UpdateAmmoObject() {
 }
 
 void APUBGA_PlayerState::UpdateAmmoAmount(FName IDx, bool bAdd, int32 Amountx) {
-
-	if (Amountx == 0) {
+	
+	if (Amountx == 0 && bAdd) {
 		if (IDx == "1") {
 			SetAmmo556(0);
 		}
@@ -352,21 +352,30 @@ void APUBGA_PlayerState::UpdateAmmoAmount(FName IDx, bool bAdd, int32 Amountx) {
 
 	}
 	else {
+		int32 TempInt = 0;
 		if (bAdd) {
 			if (IDx == "1") {
-				SetAmmo556(GetAmmo556() + Amountx);
+				TempInt = GetAmmo556();
+				
+				SetAmmo556(TempInt + Amountx);
 			}
 			else {
-				SetAmmo762(GetAmmo762() + Amountx);
+				TempInt = GetAmmo762();
+				
+				SetAmmo762(TempInt + Amountx);
 			}
 
 		}
 		else {
 			if (IDx == "1") {
-				SetAmmo556(GetAmmo556() - Amountx);
+				TempInt = GetAmmo556();
+				
+				SetAmmo556(TempInt - Amountx);
 			}
 			else {
-				SetAmmo762(GetAmmo762() - Amountx);
+				TempInt = GetAmmo762();
+				
+				SetAmmo762(TempInt - Amountx);
 			}
 		}
 	}

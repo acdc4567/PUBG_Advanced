@@ -282,7 +282,7 @@ public:
 
 	void UpdateFashionDisplay();
 
-	void PlayMontage(EMontageType MontageType);
+	void PlayMontage(EMontageType MontageType,float InPlayRates=1.f);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = CameraRestore)
 		void HoldAiming(bool bForward);

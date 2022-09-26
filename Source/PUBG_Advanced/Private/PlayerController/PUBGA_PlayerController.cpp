@@ -1916,7 +1916,7 @@ bool APUBGA_PlayerController::EquipAccessories(AItemBase* IBItemBase, bool bIsFr
 	int32 TempIndex = 0;
 	bool bFound= WeaponIDs.Find(IWeapon->ID,TempIndex);
 	
-	if (bFound&&(WeaponIDs.Num()>0)) {
+	if (!bFound&&(WeaponIDs.Num()>0)) {
 		return 0;
 	}
 	
@@ -2194,7 +2194,9 @@ void APUBGA_PlayerController::Event_ReloadEnd() {
 }
 
 
-
+void APUBGA_PlayerController::ExecuteReload() {
+	ReloadKeyPressed();
+}
 
 
 

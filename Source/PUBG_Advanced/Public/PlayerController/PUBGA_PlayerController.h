@@ -385,6 +385,13 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = SocketNames)
 		FName BackpackName = "Socket_Backpack";
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = ReloadTimes)
+		float ReplaceClipTime_Stand = 2.167f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = ReloadTimes)
+		float ReplaceClipTime_Prone = 2.4f;
+
+
 	void TakeBackWeapon();
 
 	void EquipWeapon();
@@ -396,6 +403,8 @@ public:
 	void ReverseHoldAiming();
 
 	void Event_ReloadEnd();
+
+	void ExecuteReload();
 
 
 

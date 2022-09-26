@@ -415,7 +415,7 @@ void APUBGA_Character::UpdateFashionDisplay() {
 
 
 
-void APUBGA_Character::PlayMontage(EMontageType MontageType) {
+void APUBGA_Character::PlayMontage(EMontageType MontageType, float InPlayRates) {
 	PlayingMontageType = MontageType;
 	bIsPlayingMontage = 1;
 	if (bIsProne) {
@@ -430,7 +430,7 @@ void APUBGA_Character::PlayMontage(EMontageType MontageType) {
 
 			break;
 		case EMontageType::EMT_Reload:
-			PlayAnimMontage(ProneReloadMontage);
+			PlayAnimMontage(ProneReloadMontage,InPlayRates);
 
 			break;
 		case EMontageType::EMT_ReloadBullet:
@@ -466,7 +466,7 @@ void APUBGA_Character::PlayMontage(EMontageType MontageType) {
 
 				break;
 			case EMontageType::EMT_Reload:
-				PlayAnimMontage(CrouchReloadMontage);
+				PlayAnimMontage(CrouchReloadMontage,InPlayRates);
 
 				break;
 			case EMontageType::EMT_ReloadBullet:
@@ -502,7 +502,7 @@ void APUBGA_Character::PlayMontage(EMontageType MontageType) {
 
 				break;
 			case EMontageType::EMT_Reload:
-				PlayAnimMontage(StandReloadMontage);
+				PlayAnimMontage(StandReloadMontage,InPlayRates);
 
 				break;
 			case EMontageType::EMT_ReloadBullet:
@@ -776,6 +776,14 @@ void APUBGA_Character::UnEquipFinishedNotifyHandle(USkeletalMeshComponent* MyMes
 }
 
 void APUBGA_Character::FireEndNotifyHandle(USkeletalMeshComponent* MyMesh) {
+
+	if (!PlayerStateRef)return;
+
+	if (PlayerStateRef->GetHoldGun()->Ammo == 0) {
+		PlayerControllerRef->ExecuteReload();
+	}
+
+
 
 }
 

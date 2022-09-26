@@ -280,7 +280,7 @@ void AItemWeapon::AutoFire() {
 		//GetWorldTimerManager().ClearTimer(TH_FireTimer);
 		if (ShootMode == EShootMode::ESM_Auto) {
 			GetWorldTimerManager().SetTimer(TH_FireTimer, this, &AItemWeapon::AutoFire, Datas->FiringInterval);
-			if (Ammo>=0||Ammo<0) {
+			if (Ammo>0) {
 				PlayFiringSound();
 				if (bCanPlayFiringFlash) {
 					PlayFiringFlash();
@@ -327,6 +327,7 @@ int32 AItemWeapon::CheckAmmoAmount() {
 	if (!PlayerStateRef)return 0;
 	int32 RemainAmount = PlayerStateRef->GetAmmoAmount(Datas->UseAmmoID);
 	int32 NeedAmount = 0;
+	
 	if (RemainAmount > 0) {
 		if (AccMagObj) {
 			ClipSize = AccMagObj->Datas->ClipCapacity;
@@ -335,7 +336,8 @@ int32 AItemWeapon::CheckAmmoAmount() {
 			ClipSize = Datas->ClipSize;
 		}
 		Need = ClipSize - Ammo;
-		if (Need>0) {
+		if (Need > 0 ) {
+			
 			NeedAmount = FMath::Clamp(Need,1,RemainAmount);
 			return NeedAmount;
 		}
@@ -359,7 +361,27 @@ void AItemWeapon::ReloadClip() {
 	if (!MyCharacterRef)return;
 	if (!PlayerControllerRef)return;
 	if (CheckAmmoAmount() > 0) {
-		MyCharacterRef->PlayMontage(EMontageType::EMT_Reload);
+		float ReloadRate = 0.f;
+		if (AccMagObj) {
+			ReloadRate = AccMagObj->Datas->ClipRate * Datas->ReplaceClipTime;
+			
+		}
+		else {
+			ReloadRate = Datas->ReplaceClipTime;
+			
+		}
+		if (MyCharacterRef->GetIsProne() && ReloadRate != 0.f) {
+			ReloadRate = PlayerControllerRef->ReplaceClipTime_Prone / ReloadRate;
+			
+		}
+		else {
+			if (ReloadRate != 0.f) {
+				ReloadRate = PlayerControllerRef->ReplaceClipTime_Stand / ReloadRate;
+				
+			}
+		}
+		
+		MyCharacterRef->PlayMontage(EMontageType::EMT_Reload,ReloadRate);
 
 		if (MyCharacterRef->GetIsAiming() || MyCharacterRef->GetIsSightAiming()) {
 			PlayerControllerRef->ReverseHoldAiming();
@@ -380,8 +402,6 @@ void AItemWeapon::FilledClip() {
 	Ammo += NeedAmount;
 	PlayerStateRef->UpdateAmmoAmount(Datas->UseAmmoID, 0, NeedAmount);
 	
-
-
 }
 
 
