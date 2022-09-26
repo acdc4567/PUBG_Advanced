@@ -307,8 +307,7 @@ protected:
 	UFUNCTION(BlueprintCallable)
 		bool RemoveAccessory(AItemBase* ItemAcc, bool bIsToGround, AItemWeapon* Weapon);
 
-	void ReverseHoldAiming();
-
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = WeaponAiming)
 		float AccurateRemaining=0.f;
 
@@ -330,6 +329,13 @@ protected:
 	void FireKeyReleased();
 
 	void ReleaseFire();
+
+	void StopAimState();
+
+	void ReloadKeyPressed();
+
+
+
 
 
 public:
@@ -387,6 +393,9 @@ public:
 
 	FORCEINLINE APUBGA_PlayerState* GetPlayerStateRef() const { return PlayerStateRef; }
 
+	void ReverseHoldAiming();
+
+	void Event_ReloadEnd();
 
 
 

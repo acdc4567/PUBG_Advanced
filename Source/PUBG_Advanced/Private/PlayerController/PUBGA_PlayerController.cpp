@@ -132,6 +132,7 @@ void APUBGA_PlayerController::SetupInputComponent() {
 	InputComponent->BindAction("Fire", IE_Pressed, this, &APUBGA_PlayerController::FireKeyPressed);
 	InputComponent->BindAction("Fire", IE_Released, this, &APUBGA_PlayerController::FireKeyReleased);
 
+	InputComponent->BindAction("Reload", IE_Pressed, this, &APUBGA_PlayerController::ReloadKeyPressed);
 
 
 }
@@ -152,6 +153,7 @@ void APUBGA_PlayerController::Tick(float DeltaTime) {
 
 	TargetingItem();
 	UpdateAccurateRemaining(DeltaTime);
+	StopAimState();
 
 
 }
@@ -355,8 +357,12 @@ void APUBGA_PlayerController::ProneKeyPressed() {
 
 void APUBGA_PlayerController::AimKeyPressed() {
 	if (!MyCharacterRef)return;
+	if (!PlayerStateRef)return;
 	if (!(MyCharacterRef->GetIsProne() && (MoveForwardAxis != 0 || MoveRightAxis != 0)) && !MyCharacterRef->GetIsSightAiming()&&(!MyCharacterRef->GetIsPlayingMontage()||MyCharacterRef->GetPlayingMontageType()==EMontageType::EMT_Fire)) {
 		RightPressedTime = GetWorld()->GetTimeSeconds();
+		if (PlayerStateRef->GetHoldGun()) {
+			PlayerStateRef->GetHoldGun()->FireTime = 0.f;
+		}
 
 
 		if (MyCharacterRef->GetIsHoldWeapon()) {
@@ -385,9 +391,9 @@ void APUBGA_PlayerController::AimKeyReleased() {
 				bHoldAiming = 0;
 			}
 			else {
+				MyCharacterRef->SetIsAiming(0);
 				if (bHoldAiming) {
 					bHoldAiming = 0;
-					MyCharacterRef->SetIsAiming(0);
 					MyCharacterRef->HoldAiming(0);
 					MyCharacterRef->UpdateWeaponDisplay(CalculateHoldGunSocket());
 				}
@@ -409,9 +415,9 @@ void APUBGA_PlayerController::ReverseHoldAiming() {
 		MyCharacterRef->SetIsSighAiming(0);
 	}
 	else {
+		MyCharacterRef->SetIsAiming(0);
 		if (bHoldAiming) {
 			bHoldAiming = 0;
-			MyCharacterRef->SetIsAiming(0);
 			MyCharacterRef->HoldAiming(0);
 			MyCharacterRef->UpdateWeaponDisplay(CalculateHoldGunSocket());
 		}
@@ -634,6 +640,7 @@ void APUBGA_PlayerController::RunKeyPressed() {
 			}
 		}
 		else {
+			ReverseHoldAiming();
 			bRunPressed = 1;
 		}
 	}
@@ -2139,5 +2146,58 @@ void APUBGA_PlayerController::ReleaseFire() {
 		PlayerStateRef->GetHoldGun()->ReleaseFire();
 	}
 }
+
+
+void APUBGA_PlayerController::StopAimState() {
+	if (!MyCharacterRef)return;
+	if(!PlayerStateRef)return;
+	if (!bHoldAiming && !MyCharacterRef->GetIsSightAiming()) {
+		if (PlayerStateRef->GetHoldGun()) {
+			if (PlayerStateRef->GetHoldGun()->FireTime > 0.f) {
+				if (GetWorld()->GetTimeSeconds() - PlayerStateRef->GetHoldGun()->FireTime > 3.f) {
+					MyCharacterRef->SetIsAiming(0);
+					PlayerStateRef->GetHoldGun()->FireTime = 0.f;
+				}
+			}
+
+		}
+	}
+
+
+}
+
+
+void APUBGA_PlayerController::ReloadKeyPressed() {
+	if (!PlayerStateRef)return;
+	if (!MyCharacterRef)return;
+	if (PlayerStateRef->GetHoldGun() && bEnableMove && !bAltPressed && !MyCharacterRef->GetCharacterMovement()->IsFalling()) {
+		if (!MyCharacterRef->GetIsPlayingMontage() || MyCharacterRef->GetPlayingMontageType() == EMontageType::EMT_Fire) {
+			PlayerStateRef->GetHoldGun()->ReloadClip();
+		}
+	}
+
+
+
+
+}
+
+
+void APUBGA_PlayerController::Event_ReloadEnd() {
+	if (!MyCharacterRef)return;
+	if (!PlayerStateRef)return;
+	if (MyCharacterRef->GetPlayingMontageType()==EMontageType::EMT_Reload) {
+		PlayerStateRef->GetHoldGun()->FilledClip();
+	}
+
+
+
+}
+
+
+
+
+
+
+
 
 

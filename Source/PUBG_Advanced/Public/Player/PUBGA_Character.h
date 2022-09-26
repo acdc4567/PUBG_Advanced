@@ -247,7 +247,9 @@ public:
 
 	FORCEINLINE APUBGA_PlayerState* GetPlayerStateRef() const { return PlayerStateRef; }
 
+	FORCEINLINE USkeletalMeshComponent* GetFPS_Arms() const { return FPS_Arms; }
 
+	FORCEINLINE UAnimMontage* GetArmsFireMontage() const { return ArmsFireMontage; }
 
 
 	//Setters

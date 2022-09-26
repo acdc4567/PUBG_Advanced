@@ -10,6 +10,7 @@
 #include "PlayerState/PUBGA_PlayerState.h"
 #include "PlayerController/PUBGA_PlayerController.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/SkeletalMeshComponent.h"
 
 
 
@@ -100,15 +101,11 @@ void AItemWeapon::BeginPlay() {
 
 	MyCharacterRef = Cast<APUBGA_Character>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	if (MyCharacterRef) {
-		UE_LOG(LogTemp, Warning, TEXT("CharacterRef"));
+		
 		PlayerStateRef= MyCharacterRef->GetPlayerStateRef();
-		if (PlayerStateRef) {
-			UE_LOG(LogTemp, Warning, TEXT("PlayerStaeRef"));
-		}
+		
 		PlayerControllerRef = Cast<APUBGA_PlayerController>(UGameplayStatics::GetPlayerController(this,0));
-		if (PlayerControllerRef) {
-			UE_LOG(LogTemp, Warning, TEXT("PlayerControlRef"));
-		}
+		
 	}
 
 
@@ -277,17 +274,34 @@ void AItemWeapon::PressFire() {
 
 
 void AItemWeapon::AutoFire() {
+	if (!MyCharacterRef || !PlayerControllerRef || !PlayerStateRef)return;
+	
 	if (FireGate.IsGateOpen()) {
 		//GetWorldTimerManager().ClearTimer(TH_FireTimer);
 		if (ShootMode == EShootMode::ESM_Auto) {
 			GetWorldTimerManager().SetTimer(TH_FireTimer, this, &AItemWeapon::AutoFire, Datas->FiringInterval);
-			if (true) {
+			if (Ammo>=0||Ammo<0) {
 				PlayFiringSound();
 				if (bCanPlayFiringFlash) {
 					PlayFiringFlash();
 				}
+				Ammo -= 1;
+				FireTime = GetWorld()->GetTimeSeconds();
+				MyCharacterRef->SetIsAiming(1);
 				
-				//Ammo -= 1;
+				MyCharacterRef->UpdateWeaponDisplay(PlayerControllerRef->CalculateHoldGunSocket());
+				if (MyCharacterRef->GetIsSightAiming()) {
+					MyCharacterRef->GetFPS_Arms()->GetAnimInstance()->Montage_Play(MyCharacterRef->GetArmsFireMontage(),4.f);
+
+				}
+				else {
+					MyCharacterRef->PlayMontage(EMontageType::EMT_Fire);
+				}
+
+
+
+
+
 			}
 			else {
 				UE_LOG(LogTemp, Warning, TEXT("No Bullets!!"));
@@ -308,6 +322,68 @@ void AItemWeapon::ReleaseFire() {
 	FireGate.Close();
 	GetWorldTimerManager().ClearTimer(TH_FireTimer);
 }
+
+int32 AItemWeapon::CheckAmmoAmount() {
+	if (!PlayerStateRef)return 0;
+	int32 RemainAmount = PlayerStateRef->GetAmmoAmount(Datas->UseAmmoID);
+	int32 NeedAmount = 0;
+	if (RemainAmount > 0) {
+		if (AccMagObj) {
+			ClipSize = AccMagObj->Datas->ClipCapacity;
+		}
+		else {
+			ClipSize = Datas->ClipSize;
+		}
+		Need = ClipSize - Ammo;
+		if (Need>0) {
+			NeedAmount = FMath::Clamp(Need,1,RemainAmount);
+			return NeedAmount;
+		}
+		else {
+			return 0;
+		}
+
+
+	}
+	else {
+		return 0;
+	}
+
+
+	return 0;
+
+}
+
+
+void AItemWeapon::ReloadClip() {
+	if (!MyCharacterRef)return;
+	if (!PlayerControllerRef)return;
+	if (CheckAmmoAmount() > 0) {
+		MyCharacterRef->PlayMontage(EMontageType::EMT_Reload);
+
+		if (MyCharacterRef->GetIsAiming() || MyCharacterRef->GetIsSightAiming()) {
+			PlayerControllerRef->ReverseHoldAiming();
+		}
+
+
+
+	}
+
+
+
+}
+
+
+void AItemWeapon::FilledClip() {
+
+	int32 NeedAmount = CheckAmmoAmount();
+	Ammo += NeedAmount;
+	PlayerStateRef->UpdateAmmoAmount(Datas->UseAmmoID, 0, NeedAmount);
+	
+
+
+}
+
 
 
 

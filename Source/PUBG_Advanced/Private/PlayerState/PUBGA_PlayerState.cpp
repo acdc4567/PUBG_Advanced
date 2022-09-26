@@ -476,14 +476,20 @@ void APUBGA_PlayerState::UpdateWeaponAcc(EWeaponPosition Position, EWeaponAccTyp
 	OnWeaponAccChanged.Broadcast(Weapon,!bCheckValid,ItemWeaponAcc,AccType);
 
 
-
-
-
-
 }
 
 
+int32 APUBGA_PlayerState::GetAmmoAmount(FName IDName) {
 
+	if (IDName=="1") {
+		return GetAmmo556();
+
+	}
+	else {
+		return GetAmmo762();
+	}
+
+}
 
 
 

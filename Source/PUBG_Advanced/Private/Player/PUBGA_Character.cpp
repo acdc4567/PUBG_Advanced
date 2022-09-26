@@ -438,7 +438,7 @@ void APUBGA_Character::PlayMontage(EMontageType MontageType) {
 
 			break;
 		case EMontageType::EMT_Fire:
-			PlayAnimMontage(ProneFireMontage);
+			PlayAnimMontage(ProneFireMontage,.466f);
 
 			break;
 		case EMontageType::EMT_UseItem:
@@ -474,7 +474,7 @@ void APUBGA_Character::PlayMontage(EMontageType MontageType) {
 
 				break;
 			case EMontageType::EMT_Fire:
-				PlayAnimMontage(CrouchFireMontage);
+				PlayAnimMontage(CrouchFireMontage,2.f);
 
 				break;
 			case EMontageType::EMT_UseItem:
@@ -510,7 +510,7 @@ void APUBGA_Character::PlayMontage(EMontageType MontageType) {
 
 				break;
 			case EMontageType::EMT_Fire:
-				PlayAnimMontage(StandFireMontage);
+				PlayAnimMontage(StandFireMontage,2.f);
 
 				break;
 			case EMontageType::EMT_UseItem:
@@ -780,7 +780,8 @@ void APUBGA_Character::FireEndNotifyHandle(USkeletalMeshComponent* MyMesh) {
 }
 
 void APUBGA_Character::ReloadEndNotifyHandle(USkeletalMeshComponent* MyMesh) {
-
+	if (!PlayerControllerRef)return;
+	PlayerControllerRef->Event_ReloadEnd();
 }
 
 

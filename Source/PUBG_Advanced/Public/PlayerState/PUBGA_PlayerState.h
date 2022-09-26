@@ -117,9 +117,11 @@ public:
 	UFUNCTION(BlueprintPure)
 		AItemWeapon* GetHoldGun();
 
-	int32 GetAmmo556();
+	UFUNCTION(BlueprintPure)
+		int32 GetAmmo556();
 
-	int32 GetAmmo762();
+	UFUNCTION(BlueprintPure)
+		int32 GetAmmo762();
 
 	float GetHealthPoint();
 
@@ -171,7 +173,7 @@ public:
 
 	void UpdateWeaponAcc(EWeaponPosition Position, EWeaponAccType AccType, AItemWeaponAcc* ItemWeaponAcc);
 
-
+	int32 GetAmmoAmount(FName IDName);
 
 
 

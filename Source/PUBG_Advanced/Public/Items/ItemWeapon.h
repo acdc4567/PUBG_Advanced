@@ -107,6 +107,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = MyPlayerState)
 		APUBGA_PlayerController* PlayerControllerRef;
 
+	int32 CheckAmmoAmount();
 
 public:
 
@@ -148,6 +149,20 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = FireFlashes)
 		bool bCanPlayFiringFlash = 1;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = MyPlayerState)
+		float FireTime = 0.f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = MyPlayerState)
+		int32 ClipSize = 0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = MyPlayerState)
+		int32 Need = 0;
+
+	void ReloadClip();
+
+	void FilledClip();
+
 
 
 };
