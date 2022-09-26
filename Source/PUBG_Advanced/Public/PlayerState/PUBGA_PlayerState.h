@@ -15,12 +15,14 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnergyChangedSignature, float, Va
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnEquipmentChangedSignature, AItemBase*, Equipment, bool, bIsAdd);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnFashionChangedSignature, AItemBase*, Fashion, bool, bIsAdd);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemsChangedSignature, AItemBase*, Item, bool, bIsAdd);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnWeaponAccChangedSignature, AItemWeapon*, Weapon, bool, bIsRemove, AItemWeaponAcc*, AccObj, EWeaponAccType, AccType);
 
 
 class APickUpBase;
 class AItemWeapon;
 class AItemBase;
 class APUBGA_PlayerController;
+class AItemWeaponAcc;
 
 
 /**
@@ -103,6 +105,7 @@ public:
 
 	FOnItemsChangedSignature OnItemsChanged;
 
+	FOnWeaponAccChangedSignature OnWeaponAccChanged;
 
 
 	//Getters
@@ -111,7 +114,8 @@ public:
 
 	AItemWeapon* GetWeapon2();
 
-	AItemWeapon* GetHoldGun();
+	UFUNCTION(BlueprintPure)
+		AItemWeapon* GetHoldGun();
 
 	int32 GetAmmo556();
 
@@ -164,5 +168,11 @@ public:
 	void UpdateAmmoAmount(FName IDx,bool bAdd,int32 Amountx);
 
 	bool CheckReplaceBackpack(AItemBase* Item);
+
+	void UpdateWeaponAcc(EWeaponPosition Position, EWeaponAccType AccType, AItemWeaponAcc* ItemWeaponAcc);
+
+
+
+
 
 };

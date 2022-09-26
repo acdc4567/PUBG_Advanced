@@ -39,9 +39,14 @@ protected:
 		UCameraComponent* FollowCamera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Components)
+		UCameraComponent* FPS_Camera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Components)
 		USpringArmComponent* CameraBoom;
 
-	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Components)
+		USkeletalMeshComponent* FPS_Arms;
+
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = CharacterState)
 		bool bIsDead = 0;
@@ -73,6 +78,10 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Animation)
 		bool bIsPlayingMontage = 0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Animation)
+		bool bIsSightAiming = 0;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Meshes)
 		USkeletalMeshComponent* SKM_Hair;
@@ -151,6 +160,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
 		UAnimMontage* ProneUseMontage;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
+		UAnimMontage* ArmsFireMontage;
+
 	void InitAnimations();
 
 	void EquipNotifyHandle(USkeletalMeshComponent* MyMesh);
@@ -164,6 +176,19 @@ protected:
 	void FireEndNotifyHandle(USkeletalMeshComponent* MyMesh);
 
 	void ReloadEndNotifyHandle(USkeletalMeshComponent* MyMesh);
+
+	
+	UFUNCTION(BlueprintCallable, Category = CameraRestore)
+		void ReturnedCameraLocation(FVector RetVec);
+
+	
+	FString ArmsLocationTablePath;
+
+	UDataTable* ArmsLocationTableObject;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = AimsAccurately)
+		bool bIsAimAccurate = 0;
+
 
 
 
@@ -207,12 +232,23 @@ public:
 	FORCEINLINE bool GetIsFreeFalling() const { return bIsFreeFalling; }
 	FORCEINLINE bool GetIsUmbrellaOpen() const { return bIsUmbrellaOpen; }
 	FORCEINLINE bool GetIsPlayingMontage() const { return bIsPlayingMontage; }
-	
+	FORCEINLINE bool GetIsSightAiming() const { return bIsSightAiming; }
+	FORCEINLINE bool GetIsAimAccurate() const { return bIsAimAccurate; }
+
 	FORCEINLINE float GetForwardValue() const { return ForwardValue; }
 
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	FORCEINLINE UCameraComponent* GetFPS_Camera() const { return FPS_Camera; }
+
+	FORCEINLINE EMontageType GetPlayingMontageType() const { return PlayingMontageType; }
+
+	FORCEINLINE APUBGA_PlayerState* GetPlayerStateRef() const { return PlayerStateRef; }
+
+
+
 
 	//Setters
 	void SetIsProne(const bool& Valuex);
@@ -220,6 +256,8 @@ public:
 	void SetIsAiming(const bool& Valuex);
 	FORCEINLINE void SetIsPlayingMontage(bool bValue) { bIsPlayingMontage = bValue; }
 	FORCEINLINE void SetIsHoldWeapon(bool bValue) { bIsHoldWeapon = bValue; }
+	FORCEINLINE void SetIsSightAiming(bool bValue) { bIsSightAiming = bValue; }
+	FORCEINLINE void SetIsAccurateAiming(bool bValue) { bIsAimAccurate = bValue; }
 
 
 
@@ -244,8 +282,14 @@ public:
 
 	void PlayMontage(EMontageType MontageType);
 
+	UFUNCTION(BlueprintImplementableEvent, Category = CameraRestore)
+		void HoldAiming(bool bForward);
 
+	UFUNCTION(BlueprintCallable, Category = CameraRestore)
+		void SwitchCamera(bool bIsFirst);
 
+	UFUNCTION(BlueprintImplementableEvent, Category = CameraRestore)
+		void SetIsSighAiming(bool bIsSighAiming);
 
 
 

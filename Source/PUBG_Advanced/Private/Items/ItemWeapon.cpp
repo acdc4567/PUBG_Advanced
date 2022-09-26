@@ -6,6 +6,10 @@
 #include "Components/AudioComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/PUBGA_Character.h"
+#include "PlayerState/PUBGA_PlayerState.h"
+#include "PlayerController/PUBGA_PlayerController.h"
+#include "Kismet/GameplayStatics.h"
 
 
 
@@ -90,6 +94,27 @@ void AItemWeapon::OnConstruction(const FTransform& Transform) {
 
 
 }
+
+void AItemWeapon::BeginPlay() {
+	Super::BeginPlay();
+
+	MyCharacterRef = Cast<APUBGA_Character>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (MyCharacterRef) {
+		UE_LOG(LogTemp, Warning, TEXT("CharacterRef"));
+		PlayerStateRef= MyCharacterRef->GetPlayerStateRef();
+		if (PlayerStateRef) {
+			UE_LOG(LogTemp, Warning, TEXT("PlayerStaeRef"));
+		}
+		PlayerControllerRef = Cast<APUBGA_PlayerController>(UGameplayStatics::GetPlayerController(this,0));
+		if (PlayerControllerRef) {
+			UE_LOG(LogTemp, Warning, TEXT("PlayerControlRef"));
+		}
+	}
+
+
+
+}
+
 
 void AItemWeapon::UpdateMag(AItemWeaponAcc* MagAccActor) {
 
@@ -226,15 +251,63 @@ void AItemWeapon::PlayFiringFlash() {
 }
 
 
+void AItemWeapon::SwitchShootMode() {
+
+	if (Datas->bAutoMode) {
+		if (ShootMode == EShootMode::ESM_Single) {
+			ShootMode = EShootMode::ESM_Auto;
+		}
+		else {
+			ShootMode = EShootMode::ESM_Single;
+		}
+	}
 
 
 
 
+}
 
 
 
+void AItemWeapon::PressFire() {
+	FireGate.Open();
+	AutoFire();
+}
 
 
+
+void AItemWeapon::AutoFire() {
+	if (FireGate.IsGateOpen()) {
+		//GetWorldTimerManager().ClearTimer(TH_FireTimer);
+		if (ShootMode == EShootMode::ESM_Auto) {
+			GetWorldTimerManager().SetTimer(TH_FireTimer, this, &AItemWeapon::AutoFire, Datas->FiringInterval);
+			if (true) {
+				PlayFiringSound();
+				if (bCanPlayFiringFlash) {
+					PlayFiringFlash();
+				}
+				
+				//Ammo -= 1;
+			}
+			else {
+				UE_LOG(LogTemp, Warning, TEXT("No Bullets!!"));
+			}
+			
+
+
+		}
+
+
+	}
+
+
+
+}
+
+void AItemWeapon::ReleaseFire() {
+	FireGate.Close();
+	GetWorldTimerManager().ClearTimer(TH_FireTimer);
+}
 
 
 

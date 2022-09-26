@@ -385,4 +385,52 @@ struct FSTR_ItemTypeProbability : public FTableRowBase {
 
 
 
+USTRUCT(BlueprintType)
+struct FSTR_ArmsLocation : public FTableRowBase {
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FVector Location;
+
+};
+
+USTRUCT(BlueprintType)
+struct FSTR_AimAccurately : public FTableRowBase {
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float ArmsNormalRate;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float ArmsAccuratelyRate;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float Duration;
+
+};
+
+
+
+
+
+USTRUCT(BlueprintType)
+struct FGate {
+	GENERATED_BODY()
+public:
+	FORCEINLINE void Open() { bIsGateOpen = true; }
+
+	FORCEINLINE void Close() { bIsGateOpen = false; }
+
+	FORCEINLINE void Toggle() { bIsGateOpen = !bIsGateOpen; }
+
+	FORCEINLINE bool IsGateOpen() const { return bIsGateOpen; }
+
+private:
+	UPROPERTY(VisibleAnywhere)
+		bool bIsGateOpen = true;
+
+
+};
+
+
+
+
 

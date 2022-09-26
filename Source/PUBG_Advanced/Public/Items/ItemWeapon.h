@@ -12,6 +12,9 @@
 class AItemWeaponAcc;
 class UAudioComponent;
 class UParticleSystemComponent;
+class APUBGA_Character;
+class APUBGA_PlayerState;
+class APUBGA_PlayerController;
 /**
  * 
  */
@@ -51,18 +54,25 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
 		AItemWeaponAcc* AccButtstockObj;
 
-protected:
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
 		USkeletalMeshComponent* SkeletalMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
+		UStaticMeshComponent* Sight;
+
+
+protected:
+	
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
 		UStaticMeshComponent* Mag;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
 		UStaticMeshComponent* Muzzle;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
-		UStaticMeshComponent* Sight;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
 		UStaticMeshComponent* Foregrip;
@@ -72,8 +82,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
 		UAudioComponent* AudioC;
-
-	
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
 		UParticleSystemComponent* FireFlash;
@@ -90,7 +98,17 @@ protected:
 
 	virtual void OnConstruction(const FTransform& Transform) override;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = MyCharacter)
+		APUBGA_Character* MyCharacterRef;
 	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = MyPlayerState)
+		APUBGA_PlayerState* PlayerStateRef;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = MyPlayerState)
+		APUBGA_PlayerController* PlayerControllerRef;
+
+
+public:
 
 	UFUNCTION(BlueprintCallable)
 	void UpdateMag(AItemWeaponAcc* MagAccActor);
@@ -113,13 +131,23 @@ protected:
 	UFUNCTION(BlueprintCallable)
 		void PlayFiringFlash();
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = GunMech)
+		EShootMode ShootMode=EShootMode::ESM_Auto;
 
+	void SwitchShootMode();
 
+	void PressFire();
 
+	void ReleaseFire();
 
+	FGate FireGate;
 
+	FTimerHandle TH_FireTimer;
 
+	void AutoFire();
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = FireFlashes)
+		bool bCanPlayFiringFlash = 1;
 
 
 };

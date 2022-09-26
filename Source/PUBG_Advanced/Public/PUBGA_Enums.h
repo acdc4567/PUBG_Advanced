@@ -60,6 +60,13 @@ enum class EMontageType : uint8 {
 };
 
 
+UENUM(BlueprintType)
+enum class EShootMode : uint8 {
+	ESM_Single UMETA(DisplayName = "Single"),
+	ESM_Auto UMETA(DisplayName = "Auto"),
+
+	ESM_MAX UMETA(DisplayName = "DefaultMAX")
+};
 
 
 

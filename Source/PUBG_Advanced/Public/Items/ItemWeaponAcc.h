@@ -25,11 +25,13 @@ public:
 
 	virtual int32 GetWeight() override;
 
+	EWeaponAccType AccType;
+
 protected:
 
 	
 
-	EWeaponAccType AccType;
+	
 
 	FString ItemWeaponAccTablePath;
 

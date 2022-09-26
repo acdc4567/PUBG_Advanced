@@ -5,7 +5,6 @@
 #include "Player/PUBGA_Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "PUBGA_Structs.h"
 #include "Items/PickUpBase.h"
 #include "PlayerState/PUBGA_PlayerState.h"
 #include "Kismet/GameplayStatics.h"
@@ -40,6 +39,8 @@ APUBGA_PlayerController::APUBGA_PlayerController() {
 	WalkSpeedTablePath = TEXT("DataTable'/Game/_Blueprints/Datas/DT_WalkSpeed.DT_WalkSpeed'");
 	WalkSpeedTableObject = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *WalkSpeedTablePath));
 
+	AimAccuratelyTablePath = TEXT("DataTable'/Game/_Blueprints/Datas/DT_AimAccurately.DT_AimAccurately'");
+	AimAccuratelyTableObject = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *AimAccuratelyTablePath));
 
 
 }
@@ -66,6 +67,8 @@ void APUBGA_PlayerController::BeginPlay() {
 
 		PlayerStateRef->OnAmmoChanged.AddDynamic(this, &APUBGA_PlayerController::Event_AmmoChanged);
 
+		PlayerStateRef->OnWeaponAccChanged.AddDynamic(this, &APUBGA_PlayerController::Event_WeaponAccChanged);
+
 		MyCharacterRef->GetMesh()->GetAnimInstance()->OnMontageEnded.AddDynamic(this,&APUBGA_PlayerController::Event_OnMontageEnded);
 	
 	
@@ -76,6 +79,13 @@ void APUBGA_PlayerController::BeginPlay() {
 		PickupItems = GameModeRef->GeneratedItems;
 		SetPickupItems(PickupItems);
 	}
+
+	FSTR_AimAccurately* AimAccuratelyRow= AimAccuratelyTableObject->FindRow<FSTR_AimAccurately>(FName("NewRow"), TEXT(""));
+	if (AimAccuratelyRow) {
+		AimAccuratelyDatas = AimAccuratelyRow;
+		AccurateRemaining = AimAccuratelyRow->Duration;
+	}
+
 
 }
 
@@ -117,6 +127,12 @@ void APUBGA_PlayerController::SetupInputComponent() {
 
 	InputComponent->BindAction("Keyboard2", IE_Pressed, this, &APUBGA_PlayerController::Keyboard2KeyPressed);
 
+	InputComponent->BindAction("ShootMode", IE_Pressed, this, &APUBGA_PlayerController::ShootModeKeyPressed);
+
+	InputComponent->BindAction("Fire", IE_Pressed, this, &APUBGA_PlayerController::FireKeyPressed);
+	InputComponent->BindAction("Fire", IE_Released, this, &APUBGA_PlayerController::FireKeyReleased);
+
+
 
 }
 
@@ -135,6 +151,8 @@ void APUBGA_PlayerController::Tick(float DeltaTime) {
 	}
 
 	TargetingItem();
+	UpdateAccurateRemaining(DeltaTime);
+
 
 }
 
@@ -175,20 +193,29 @@ void APUBGA_PlayerController::MouseLookUp(float AxisValue) {
 }
 
 void APUBGA_PlayerController::MoveFwd(float AxisValue) {
-	if (MoveForwardAxis != AxisValue) {
-		MoveForwardAxis = AxisValue;
-		UpdateCameraHeight();
-		MyCharacterRef->UpdateWeaponDisplay(CalculateHoldGunSocket());
-	}
+	if (!MyCharacterRef)return;
+	if (!(MyCharacterRef->GetIsProne()&&MyCharacterRef->GetIsAiming())) {
+		if (MoveForwardAxis != AxisValue) {
+			MoveForwardAxis = AxisValue;
+			UpdateCameraHeight();
+			MyCharacterRef->UpdateWeaponDisplay(CalculateHoldGunSocket());
+		}
 
-	if (bEnableMove) {
-		UpdateWalkSpeed();
-		MovingOnTheGround(1, AxisValue, GetControllerRotation());
+		if (bEnableMove) {
+			UpdateWalkSpeed();
+			MovingOnTheGround(1, AxisValue, GetControllerRotation());
+		}
 	}
+	
+	
 	
 }
 
 void APUBGA_PlayerController::MoveRt(float AxisValue) {
+	if (!MyCharacterRef)return;
+	if (MyCharacterRef->GetIsProne() && MyCharacterRef->GetIsAiming())return;
+
+
 	if (MoveRightAxis != AxisValue) {
 		MoveRightAxis = AxisValue;
 		UpdateCameraHeight();
@@ -238,9 +265,11 @@ void APUBGA_PlayerController::MovingOnTheGround(const bool& bForward, const floa
 }
 
 void APUBGA_PlayerController::AltKeyPressed() {
-	//UE_LOG(LogTemp, Warning, TEXT("AltPressed"));
+	
 	if (!MyCharacterRef)return;
+	ReverseHoldAiming();
 	bAltPressed = 1;
+	ReleaseFire();
 	AltPressedRotation = MyCharacterRef->GetCameraBoom()->GetTargetRotation();
 
 }
@@ -273,6 +302,8 @@ void APUBGA_PlayerController::CrouchKeyPressed() {
 	if (MyCharacterRef->GetIsProne()) {
 		MyCharacterRef->SetIsProne(0);
 		MyCharacterRef->SetIsCrouching(1);
+		ReleaseFire();
+		ReverseHoldAiming();
 		HandleProneTimeFromTable(3, 2);
 	}
 	else {
@@ -295,18 +326,24 @@ void APUBGA_PlayerController::ProneKeyPressed() {
 	if (!MyCharacterRef)return;
 	if (MyCharacterRef->GetIsProne()) {
 		MyCharacterRef->SetIsProne(0);
+		ReverseHoldAiming();
+		ReleaseFire();
 		HandleProneTimeFromTable(3, 1);
 	}
 	else {
 		if (MyCharacterRef->GetIsCrouching()) {
+			MyCharacterRef->SetIsAiming(0);
 			MyCharacterRef->SetIsCrouching(0);
 			MyCharacterRef->SetIsProne(1);
-			MyCharacterRef->SetIsAiming(0);
+			ReverseHoldAiming();
+			ReleaseFire();
 			HandleProneTimeFromTable(3, 2);
 		}
 		else {
-			MyCharacterRef->SetIsProne(1);
 			MyCharacterRef->SetIsAiming(0);
+			MyCharacterRef->SetIsProne(1);
+			ReverseHoldAiming();
+			ReleaseFire();
 			HandleProneTimeFromTable(1, 3);
 		}
 	}
@@ -318,22 +355,83 @@ void APUBGA_PlayerController::ProneKeyPressed() {
 
 void APUBGA_PlayerController::AimKeyPressed() {
 	if (!MyCharacterRef)return;
-	MyCharacterRef->SetIsAiming(1);
-	MyCharacterRef->UpdateWeaponDisplay(CalculateHoldGunSocket());
+	if (!(MyCharacterRef->GetIsProne() && (MoveForwardAxis != 0 || MoveRightAxis != 0)) && !MyCharacterRef->GetIsSightAiming()&&(!MyCharacterRef->GetIsPlayingMontage()||MyCharacterRef->GetPlayingMontageType()==EMontageType::EMT_Fire)) {
+		RightPressedTime = GetWorld()->GetTimeSeconds();
+
+
+		if (MyCharacterRef->GetIsHoldWeapon()) {
+			bHoldAiming = 1;
+			MyCharacterRef->SetIsAiming(1);
+			MyCharacterRef->HoldAiming(1);
+			MyCharacterRef->UpdateWeaponDisplay(CalculateHoldGunSocket());
+		}
+	}
+	
 
 }
 void APUBGA_PlayerController::AimKeyReleased() {
 	if (!MyCharacterRef)return;
-	MyCharacterRef->SetIsAiming(0);
-	MyCharacterRef->UpdateWeaponDisplay(CalculateHoldGunSocket());
+
+	if (MyCharacterRef->GetIsHoldWeapon()) {
+		if (MyCharacterRef->GetIsSightAiming()) {
+			MyCharacterRef->SwitchCamera(0);
+			MyCharacterRef->HoldAiming(0);
+			MyCharacterRef->SetIsSighAiming(0);
+
+		}
+		else {
+			if (GetWorld()->GetTimeSeconds() - RightPressedTime < .15f) {
+				MyCharacterRef->SetIsSighAiming(1);
+				bHoldAiming = 0;
+			}
+			else {
+				if (bHoldAiming) {
+					bHoldAiming = 0;
+					MyCharacterRef->SetIsAiming(0);
+					MyCharacterRef->HoldAiming(0);
+					MyCharacterRef->UpdateWeaponDisplay(CalculateHoldGunSocket());
+				}
+			}
+		}
+
+	}
+
+
+	
+
 }
 
+void APUBGA_PlayerController::ReverseHoldAiming() {
+	if (!MyCharacterRef)return;
+	if (MyCharacterRef->GetIsSightAiming()) {
+		MyCharacterRef->SwitchCamera(0);
+		MyCharacterRef->HoldAiming(0);
+		MyCharacterRef->SetIsSighAiming(0);
+	}
+	else {
+		if (bHoldAiming) {
+			bHoldAiming = 0;
+			MyCharacterRef->SetIsAiming(0);
+			MyCharacterRef->HoldAiming(0);
+			MyCharacterRef->UpdateWeaponDisplay(CalculateHoldGunSocket());
+		}
+	}
+	
+	
+	
+	
+	
+}
 
 void APUBGA_PlayerController::JumpKeyPressed() {
 	if (!MyCharacterRef)return;
+
+
 	if (MyCharacterRef->GetIsProne()) {
 		MyCharacterRef->SetIsProne(0);
 		MyCharacterRef->SetIsCrouching(1);
+		ReleaseFire();
+		ReverseHoldAiming();
 	}
 	else {
 		if (MyCharacterRef->GetIsCrouching()) {
@@ -341,10 +439,15 @@ void APUBGA_PlayerController::JumpKeyPressed() {
 		}
 		else {
 			MyCharacterRef->Jump();
+			ReleaseFire();
 		}
 	}
 
 	UpdateCameraHeight();
+
+
+
+	
 
 }
 
@@ -506,6 +609,9 @@ void APUBGA_PlayerController::UpdateCameraHeight() {
 }
 
 void APUBGA_PlayerController::UpdateCurrentHeight(float UpdatedHeight) {
+	FVector FPS_RelativeLocation = MyCharacterRef->GetFPS_Camera()->GetRelativeLocation();
+	FVector FPS_RelativeLoc = FVector(FPS_RelativeLocation.X, FPS_RelativeLocation.Y,UpdatedHeight-25.f);
+	MyCharacterRef->GetFPS_Camera()->SetRelativeLocation(FPS_RelativeLoc);
 	CurrentHeight = UpdatedHeight;
 }
 
@@ -521,13 +627,25 @@ void APUBGA_PlayerController::WalkKeyReleased() {
 }
 
 void APUBGA_PlayerController::RunKeyPressed() {
-
-	bRunPressed = 1;
+	if (MyCharacterRef) {
+		if (MyCharacterRef->GetIsSightAiming()) {
+			if (AccurateRemaining>0.f) {
+				MyCharacterRef->SetIsAccurateAiming(1);
+			}
+		}
+		else {
+			bRunPressed = 1;
+		}
+	}
+	
 }
 
 void APUBGA_PlayerController::RunKeyReleased() {
+	if (MyCharacterRef) {
+		bRunPressed = 0;
+		MyCharacterRef->SetIsAccurateAiming(0);
+	}
 
-	bRunPressed = 0;
 }
 
 void APUBGA_PlayerController::UpdateWalkSpeed() {
@@ -745,6 +863,9 @@ void APUBGA_PlayerController::Event_FashionChanged(AItemBase* Fashion, bool bIsA
 void APUBGA_PlayerController::Event_ItemsChanged(AItemBase* Item, bool bIsAdd) {
 	Event_ItemsChanges();
 
+}
+
+void APUBGA_PlayerController::Event_WeaponAccChanged(AItemWeapon* Weapon, bool bIsRemove, AItemWeaponAcc* AccObj, EWeaponAccType AccType) {
 }
 
 void APUBGA_PlayerController::Event_AmmoChanged(bool bIsTrue) {
@@ -1207,10 +1328,11 @@ FName APUBGA_PlayerController::GenerateSN() {
 void APUBGA_PlayerController::DiscardKeyPressed() {
 	if (!MyCharacterRef)return;
 	if (!PlayerStateRef)return;
-	if (!MyCharacterRef->GetIsProne()) {
+	if (!MyCharacterRef->GetIsProne()&&!MyCharacterRef->GetIsSightAiming()) {
 		if (!MyCharacterRef->GetIsPlayingMontage()) {
 			if (PlayerStateRef->GetHoldGun()) {
 				DiscardWeapon(PlayerStateRef->GetHoldGun());
+				ReverseHoldAiming();
 			}
 			else {
 				if (PlayerStateRef->GetWeapon1()) {
@@ -1446,6 +1568,9 @@ void APUBGA_PlayerController::TakeBackKeyPressed() {
 	if (!PlayerStateRef)return;
 	if (!MyCharacterRef)return;
 	if (PlayerStateRef->GetHoldGun()) {
+		ReleaseFire();
+		MyCharacterRef->SetIsAiming(0);
+		ReverseHoldAiming();
 		MyCharacterRef->PlayMontage(EMontageType::EMT_UnEquip);
 	}
 }
@@ -1480,7 +1605,10 @@ void APUBGA_PlayerController::Keyboard1KeyPressed() {
 	if (!MyCharacterRef)return;
 	ReadyEquipWeapon = PlayerStateRef->GetWeapon1();
 	if (ReadyEquipWeapon) {
+		MyCharacterRef->SetIsAiming(0);
+		ReverseHoldAiming();
 		if (PlayerStateRef->GetHoldGun()) {
+			ReleaseFire();
 			MyCharacterRef->PlayMontage(EMontageType::EMT_UnEquip);
 		}
 		else {
@@ -1497,7 +1625,10 @@ void APUBGA_PlayerController::Keyboard2KeyPressed() {
 	if (!PlayerStateRef)return;
 	ReadyEquipWeapon = PlayerStateRef->GetWeapon2();
 	if (ReadyEquipWeapon) {
+		MyCharacterRef->SetIsAiming(0);
+		ReverseHoldAiming();
 		if (PlayerStateRef->GetHoldGun()) {
+			ReleaseFire();
 			MyCharacterRef->PlayMontage(EMontageType::EMT_UnEquip);
 		}
 		else {
@@ -1750,6 +1881,174 @@ void APUBGA_PlayerController::PickupFashion(APickUpBase* PUItem) {
 
 }
 
+bool APUBGA_PlayerController::EquipAccessories(AItemBase* IBItemBase, bool bIsFromGround, AItemWeapon* IWeapon) {
+	if (!PlayerStateRef)return 0;
+
+	APickUpWeaponAcc* IBCastToPickupWeaponAcc = nullptr;
+	AItemWeaponAcc* IBCastToItemWeaponAcc = nullptr;
+	TArray<FName> WeaponIDs;
+	
+	EWeaponAccType AccType=EWeaponAccType::EWAT_MAX;
+	if (bIsFromGround) {
+		IBCastToPickupWeaponAcc = Cast<APickUpWeaponAcc>(IBItemBase);
+		if (IBCastToPickupWeaponAcc) {
+			AccType = IBCastToPickupWeaponAcc->AccType;
+			WeaponIDs= IBCastToPickupWeaponAcc->Datas->WeaponIDs;
+
+
+		}
+	}
+	else {
+		IBCastToItemWeaponAcc=Cast<AItemWeaponAcc>(IBItemBase);
+		if (IBCastToItemWeaponAcc) {
+			AccType = IBCastToItemWeaponAcc->AccType;
+			WeaponIDs = IBCastToItemWeaponAcc->Datas->WeaponIDs;
+
+		}
+	}
+	int32 TempIndex = 0;
+	bool bFound= WeaponIDs.Find(IWeapon->ID,TempIndex);
+	
+	if (bFound&&(WeaponIDs.Num()>0)) {
+		return 0;
+	}
+	
+	AItemWeaponAcc* ReplacedAccObj = nullptr;
+
+
+
+	switch (AccType) {
+	case EWeaponAccType::EWAT_Sight:
+		ReplacedAccObj = IWeapon->AccSightObj;
+
+		break;
+	case EWeaponAccType::EWAT_Muzzle:
+		ReplacedAccObj = IWeapon->AccMuzzleObj;
+
+
+		break;
+	case EWeaponAccType::EWAT_Foregrip:
+		ReplacedAccObj = IWeapon->AccForegripObj;
+
+
+		break;
+	case EWeaponAccType::EWAT_Mag:
+		ReplacedAccObj = IWeapon->AccMagObj;
+
+
+		break;
+	case EWeaponAccType::EWAT_Buttstock:
+		ReplacedAccObj = IWeapon->AccButtstockObj;
+
+
+		break;
+	case EWeaponAccType::EWAT_MAX:
+
+
+		break;
+	default:
+		break;
+	}
+
+	if (ReplacedAccObj) {
+		int32 TempIBWeaight = IBItemBase->GetWeight();
+		int32 TempReplacedAccObjWeight = ReplacedAccObj->GetWeight();
+		bool bIsEnough=0;
+		if (bIsFromGround) {
+			bIsEnough = PlayerStateRef->CheckBackpackCapacity(TempReplacedAccObjWeight);
+		}
+		else {
+			bIsEnough = PlayerStateRef->CheckBackpackCapacity(TempReplacedAccObjWeight - TempIBWeaight);
+		}
+
+		if (bIsEnough) {
+			AItemBase* ReplacedAccObjCastToIB = Cast<AItemBase>(ReplacedAccObj);
+			if (ReplacedAccObjCastToIB) {
+				PlayerStateRef->AddItem(ReplacedAccObjCastToIB);
+			}
+			
+
+		}
+		else {
+			UE_LOG(LogTemp, Warning, TEXT("Backpack does not have Capacity for Accessory"));
+			return 0;
+		}
+
+	}
+
+	AItemBase* WeaponAccObj = nullptr;
+
+	if (bIsFromGround) {
+		FTransform Transformx;
+		Transformx.SetLocation(FVector::ZeroVector);
+		AItemWeaponAcc* IBWeaponAcc = nullptr;
+		
+
+		IBWeaponAcc = GetWorld()->SpawnActorDeferred<AItemWeaponAcc>(AItemWeaponAcc::StaticClass(), Transformx);
+		if (IBWeaponAcc) {
+			IBWeaponAcc->ID= IBItemBase->ID;
+			IBWeaponAcc->SN = IBItemBase->SN;
+			IBWeaponAcc->Amount = IBItemBase->Amount;
+			IBWeaponAcc->FinishSpawning(Transformx);
+
+			WeaponAccObj = Cast<AItemBase>(IBWeaponAcc);
+			if (WeaponAccObj) {
+				IBItemBase->Destroy();
+			}
+
+
+		}
+
+	}
+	else {
+
+		bool bSuccess= PlayerStateRef->RemoveItem(IBItemBase);
+		WeaponAccObj = IBItemBase;
+
+	}
+
+	AItemWeaponAcc* WeaponAccObjCastToIWA = Cast<AItemWeaponAcc>(WeaponAccObj);
+	if (WeaponAccObjCastToIWA) {
+		PlayerStateRef->UpdateWeaponAcc(IWeapon->Position, WeaponAccObjCastToIWA->AccType, WeaponAccObjCastToIWA);
+	}
+
+
+	
+	
+	return 0;
+}
+
+bool APUBGA_PlayerController::RemoveAccessory(AItemBase* ItemAcc, bool bIsToGround, AItemWeapon* Weapon) {
+	if (!PlayerStateRef)return 0;
+	if (bIsToGround) {
+		APickUpBase* PUItem= SpawnPickupItems(ItemAcc);
+		AItemWeaponAcc* ItemAccCastToIWA = Cast<AItemWeaponAcc>(ItemAcc);
+		if (ItemAccCastToIWA) {
+			PlayerStateRef->UpdateWeaponAcc(Weapon->Position, ItemAccCastToIWA->AccType, nullptr);
+			ItemAcc->Destroy();
+		}
+		
+	}
+	else {
+		if (PlayerStateRef->CheckBackpackCapacity(ItemAcc->GetWeight())) {
+			AItemWeaponAcc* ItemAccCastToIWA = Cast<AItemWeaponAcc>(ItemAcc);
+			if (ItemAccCastToIWA) {
+				PlayerStateRef->UpdateWeaponAcc(Weapon->Position, ItemAccCastToIWA->AccType, nullptr);
+				PlayerStateRef->AddItem(ItemAcc);
+				return 1;
+			}
+
+		}
+		else {
+			UE_LOG(LogTemp, Warning, TEXT("Backpack Does Not Have Enough Space"));
+			return 0;
+		}
+	}
+	
+	
+	return false;
+}
+
 
 
 
@@ -1783,5 +2082,62 @@ void APUBGA_PlayerController::EquipWeapon() {
 
 }
 
+
+
+void APUBGA_PlayerController::UpdateAccurateRemaining(float Delta) {
+	if (!MyCharacterRef)return;
+	if (MyCharacterRef->GetIsAimAccurate()) {
+		if (AccurateRemaining > 0.f) {
+			AccurateRemaining = FMath::Clamp(AccurateRemaining - Delta, 0.f, 3.f);
+		}
+		else {
+			MyCharacterRef->SetIsAccurateAiming(0);
+		}
+	}
+	else {
+		AccurateRemaining = FMath::Clamp(AccurateRemaining + Delta, 0.f, 3.f);
+	}
+
+
+}
+
+
+void APUBGA_PlayerController::ShootModeKeyPressed() {
+	if (!PlayerStateRef)return;
+	if (PlayerStateRef->GetHoldGun()) {
+		PlayerStateRef->GetHoldGun()->SwitchShootMode();
+	}
+
+}
+
+void APUBGA_PlayerController::FireKeyPressed() {
+	if (!PlayerStateRef)return;
+	if (!MyCharacterRef)return;
+	if (PlayerStateRef->GetHoldGun() && !(MyCharacterRef->GetCharacterMovement()->Velocity.Size() != 0.f && MyCharacterRef->GetIsProne()) && bEnableMove && !bAltPressed && !MyCharacterRef->GetCharacterMovement()->IsFalling()) {
+		if (!MyCharacterRef->GetIsPlayingMontage()||MyCharacterRef->GetPlayingMontageType()==EMontageType::EMT_Fire) {
+			PlayerStateRef->GetHoldGun()->PressFire();
+		}
+		
+	
+	}
+
+	
+
+
+}
+
+void APUBGA_PlayerController::FireKeyReleased() {
+	if (!PlayerStateRef)return;
+	if (PlayerStateRef->GetHoldGun()) {
+		PlayerStateRef->GetHoldGun()->ReleaseFire();
+	}
+}
+
+void APUBGA_PlayerController::ReleaseFire() {
+	if (!PlayerStateRef)return;
+	if (PlayerStateRef->GetHoldGun()) {
+		PlayerStateRef->GetHoldGun()->ReleaseFire();
+	}
+}
 
 

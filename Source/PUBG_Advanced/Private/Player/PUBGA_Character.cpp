@@ -22,6 +22,7 @@
 #include "Animation/Notifies/OnUnEquipEndAnimNotify.h"
 #include "Animation/Notifies/FireEndAnimNotify.h"
 #include "Animation/Notifies/ReloadEndAnimNotify.h"
+#include "Items/ItemWeaponAcc.h"
 
 
 
@@ -36,6 +37,14 @@ APUBGA_Character::APUBGA_Character()
 
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>("FollowCamera");
 	FollowCamera->SetupAttachment(CameraBoom);
+
+	FPS_Camera = CreateDefaultSubobject<UCameraComponent>("FPS_Camera");
+	FPS_Camera->AddRelativeLocation(FVector(0.f,0.f,75.f));
+	FPS_Camera->bUsePawnControlRotation = 1;
+	FPS_Camera->SetupAttachment(GetRootComponent());
+
+	FPS_Arms = CreateDefaultSubobject<USkeletalMeshComponent>("FPS_Arms");
+	FPS_Arms->SetupAttachment(FPS_Camera);
 
 	GetCharacterMovement()->bUseSeparateBrakingFriction = 1;
 
@@ -64,6 +73,8 @@ APUBGA_Character::APUBGA_Character()
 	ItemFashionTablePath = TEXT("DataTable'/Game/_Blueprints/Datas/DT_ItemFashion.DT_ItemFashion'");
 	ItemFashionTableObject = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *ItemFashionTablePath));
 
+	ArmsLocationTablePath = TEXT("DataTable'/Game/_Blueprints/Datas/DT_ArmsLocation.DT_ArmsLocation'");
+	ArmsLocationTableObject = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *ArmsLocationTablePath));
 
 	
 
@@ -262,12 +273,15 @@ UTexture* APUBGA_Character::GetFashionDatasTexture(FName ID) {
 void APUBGA_Character::UpdateWeaponDisplay(FName HoldSocket) {
 	if (!PlayerStateRef)return;
 	if (!PlayerControllerRef)return;
-	if (HoldSocket != "None") {
-		if (PlayerStateRef->GetHoldGun()) {
-			Attach(PlayerStateRef->GetHoldGun(), HoldSocket);
+	if (!bIsSightAiming) {
+		if (HoldSocket != "None") {
+			if (PlayerStateRef->GetHoldGun()) {
+				Attach(PlayerStateRef->GetHoldGun(), HoldSocket);
 
+			}
 		}
 	}
+	
 	
 	bool bIsEquipBackpack = 0;
 	TArray<AItemBase*> Equipments = PlayerStateRef->GetEquipments();
@@ -536,6 +550,7 @@ void APUBGA_Character::InitAnimations() {
 	if (!ProneReloadMontage)return;
 	if (!ProneFireMontage)return;
 	if (!ProneUseMontage)return;
+	if (!ArmsFireMontage)return;
 
 
 	const auto NotifyEvents = StandEquipMontage->Notifies;
@@ -724,7 +739,16 @@ void APUBGA_Character::InitAnimations() {
 
 	}
 
+	const auto NotifyEvents12 = ArmsFireMontage->Notifies;
+	for (auto NotifyEvent : NotifyEvents12) {
+		auto FireEndNotify = Cast<UFireEndAnimNotify>(NotifyEvent.Notify);
+		if (FireEndNotify) {
+			FireEndNotify->OnNotified.AddUObject(this, &APUBGA_Character::FireEndNotifyHandle);
 
+			break;
+		}
+
+	}
 
 
 }
@@ -758,3 +782,125 @@ void APUBGA_Character::FireEndNotifyHandle(USkeletalMeshComponent* MyMesh) {
 void APUBGA_Character::ReloadEndNotifyHandle(USkeletalMeshComponent* MyMesh) {
 
 }
+
+
+void APUBGA_Character::ReturnedCameraLocation(FVector RetVec) {
+	FollowCamera->SetRelativeLocation(RetVec);
+
+}
+
+void APUBGA_Character::SwitchCamera(bool bIsFirst) {
+	if (!PlayerStateRef)return;
+	if (!PlayerControllerRef)return;
+	FPS_Arms->SetVisibility(bIsFirst, 1);
+	FPS_Camera->SetActive(bIsFirst, 0);
+	GetMesh()->SetVisibility(!bIsFirst, 1);
+	FollowCamera->SetActive(!bIsFirst, 0);
+
+
+	FTransform NewTransfrm;
+	if (bIsFirst) {
+		NewTransfrm = FPS_Arms->GetSocketTransform(FName("WeaponSocket"));
+	}
+	else {
+		FName TPS_SocketTransformName = PlayerControllerRef->CalculateHoldGunSocket();
+		NewTransfrm = GetMesh()->GetSocketTransform(TPS_SocketTransformName);
+	}
+	PlayerStateRef->GetHoldGun()->SetActorTransform(NewTransfrm);
+
+	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, EAttachmentRule::KeepRelative, true);
+	if (bIsFirst) {
+		PlayerStateRef->GetHoldGun()->AttachToComponent(FPS_Arms, AttachmentRules, FName("WeaponSocket"));
+	}
+	else {
+		PlayerStateRef->GetHoldGun()->AttachToComponent(GetMesh(), AttachmentRules, PlayerControllerRef->CalculateHoldGunSocket());
+	}
+
+	PlayerStateRef->GetHoldGun()->SkeletalMesh->SetVisibility(1, 1);
+
+	if (PlayerStateRef->GetHoldGun()->AccSightObj) {
+		if (PlayerStateRef->GetHoldGun()->AccSightObj->ID == "2"&&bIsFirst) {
+			PlayerStateRef->GetHoldGun()->Sight->SetRelativeScale3D(FVector(.1f, 1.f, 1.f));
+
+			FPS_Camera->SetFieldOfView(28.f);
+			FPS_Arms->SetVisibility(0, 0);
+		}
+		else {
+			PlayerStateRef->GetHoldGun()->Sight->SetRelativeScale3D(FVector(1.f));
+			FPS_Camera->SetFieldOfView(90.f);
+		}
+	}
+	FName WeaponID;
+	FName SightID;
+	if (bIsFirst) {
+		WeaponID = PlayerStateRef->GetHoldGun()->ID;
+		if (PlayerStateRef->GetHoldGun()->AccSightObj) {
+			SightID = PlayerStateRef->GetHoldGun()->AccSightObj->ID;
+		}
+		else {
+			SightID = "0";
+		}
+
+
+		FSTR_ArmsLocation* ArmsLocationRow = nullptr;
+		if (WeaponID == "1" && SightID == "0") {
+			ArmsLocationRow = ArmsLocationTableObject->FindRow<FSTR_ArmsLocation>("1_0", TEXT(""));
+		}
+		else if (WeaponID == "2" && SightID == "0") {
+
+			ArmsLocationRow = ArmsLocationTableObject->FindRow<FSTR_ArmsLocation>("2_0", TEXT(""));
+		}
+		else if (WeaponID == "3" && SightID == "0") {
+
+			ArmsLocationRow = ArmsLocationTableObject->FindRow<FSTR_ArmsLocation>("3_0", TEXT(""));
+		}
+		else if (WeaponID == "1" && SightID == "1") {
+
+			ArmsLocationRow = ArmsLocationTableObject->FindRow<FSTR_ArmsLocation>("1_1", TEXT(""));
+		}
+		else if (WeaponID == "2" && SightID == "1") {
+
+			ArmsLocationRow = ArmsLocationTableObject->FindRow<FSTR_ArmsLocation>("2_1", TEXT(""));
+		}
+		else if (WeaponID == "3" && SightID == "1") {
+
+			ArmsLocationRow = ArmsLocationTableObject->FindRow<FSTR_ArmsLocation>("3_1", TEXT(""));
+		}
+		else if (WeaponID == "1" && SightID == "2") {
+
+			ArmsLocationRow = ArmsLocationTableObject->FindRow<FSTR_ArmsLocation>("1_2", TEXT(""));
+		}
+		else if (WeaponID == "2" && SightID == "2") {
+
+			ArmsLocationRow = ArmsLocationTableObject->FindRow<FSTR_ArmsLocation>("2_2", TEXT(""));
+		}
+		else if (WeaponID == "3" && SightID == "2") {
+
+			ArmsLocationRow = ArmsLocationTableObject->FindRow<FSTR_ArmsLocation>("3_2", TEXT(""));
+		}
+		if (ArmsLocationRow) {
+			FPS_Arms->SetRelativeLocation(ArmsLocationRow->Location);
+		}
+
+	}
+	
+	TArray<AItemBase*> EquippedItems = PlayerStateRef->GetEquipments();
+	for (AItemBase* EquippedItem: EquippedItems) {
+		if (EquippedItem->ItemType == EItemType::EIT_Helmet && !bIsFirst) {
+			SKM_Hair->SetVisibility(0, 1);
+		}
+	}
+
+
+
+
+
+
+
+}
+
+
+
+
+
+

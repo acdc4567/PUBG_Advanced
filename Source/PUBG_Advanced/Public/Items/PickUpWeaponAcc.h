@@ -6,6 +6,7 @@
 #include "Items/PickUpBase.h"
 #include "PUBGA_Enums.h"
 #include "Engine/DataTable.h"
+#include "PUBGA_Structs.h"
 #include "PickUpWeaponAcc.generated.h"
 
 /**
@@ -24,6 +25,8 @@ public:
 		EWeaponAccType AccType;
 
 	virtual int32 GetWeight() override;
+
+	FSTR_ItemWeaponAcc* Datas = nullptr;
 
 protected:
 

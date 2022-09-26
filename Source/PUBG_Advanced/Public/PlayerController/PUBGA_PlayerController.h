@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "Components/TimelineComponent.h"
 #include "Engine/DataTable.h"
+#include "PUBGA_Structs.h"
 #include "PUBGA_PlayerController.generated.h"
 
 class APUBGA_Character;
@@ -14,6 +15,8 @@ class APUBGA_PlayerState;
 class APUBGA_GameModeBase;
 class APickUpWeapon;
 class AItemWeapon;
+
+
 /**
  * 
  */
@@ -183,6 +186,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Input)
 		bool bRunPressed = 0;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = WeaponAiming)
+		bool bHoldAiming = 0;
+
+
 	void ReturnThreeIntegers(int32& HoldWeapon, int32& Posture, int32& MoveState);
 
 	FString WalkSpeedTablePath;
@@ -195,8 +202,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Items)
 		TArray<APickUpBase*> ItemsInRange;
 
-	
-	FName CalculateHoldGunSocket();
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Items)
+		float RightPressedTime=0.f;
+
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Input)
 		APUBGA_PlayerState* PlayerStateRef;
@@ -212,6 +220,10 @@ protected:
 
 	UFUNCTION()
 		void Event_ItemsChanged(AItemBase* Item, bool bIsAdd);
+
+	UFUNCTION()
+		void Event_WeaponAccChanged( AItemWeapon* Weapon, bool bIsRemove, AItemWeaponAcc* AccObj, EWeaponAccType AccType);
+
 
 	UFUNCTION()
 		void Event_AmmoChanged(bool bIsTrue);
@@ -289,8 +301,35 @@ protected:
 
 	void PickupFashion(APickUpBase* PUItem);
 
+	UFUNCTION(BlueprintCallable)
+		bool EquipAccessories(AItemBase* IBItemBase,bool bIsFromGround,AItemWeapon* IWeapon);
 
+	UFUNCTION(BlueprintCallable)
+		bool RemoveAccessory(AItemBase* ItemAcc, bool bIsToGround, AItemWeapon* Weapon);
 
+	void ReverseHoldAiming();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = WeaponAiming)
+		float AccurateRemaining=0.f;
+
+	FString AimAccuratelyTablePath;
+
+	UDataTable* AimAccuratelyTableObject;
+
+	FSTR_AimAccurately* AimAccuratelyDatas=nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = WeaponAiming)
+		float AimAccuratelyRemaining = 0.f;
+
+	void UpdateAccurateRemaining(float Delta);
+
+	void ShootModeKeyPressed();
+
+	void FireKeyPressed();
+
+	void FireKeyReleased();
+
+	void ReleaseFire();
 
 
 public:
@@ -344,7 +383,9 @@ public:
 
 	void EquipWeapon();
 
-	
+	FName CalculateHoldGunSocket();
+
+	FORCEINLINE APUBGA_PlayerState* GetPlayerStateRef() const { return PlayerStateRef; }
 
 
 

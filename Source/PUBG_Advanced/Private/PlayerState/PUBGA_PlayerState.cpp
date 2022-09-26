@@ -9,6 +9,7 @@
 #include "PlayerController/PUBGA_PlayerController.h"
 #include "PUBGA_Structs.h"
 #include "Items/ItemAmmo.h"
+#include "Items/ItemWeaponAcc.h"
 
 
 
@@ -398,6 +399,87 @@ bool APUBGA_PlayerState::CheckReplaceBackpack(AItemBase* Item) {
 
 
 	return PlayerControllerRef->DefaultCapacity + PickupCapacity >= ItemsWeight;
+}
+
+void APUBGA_PlayerState::UpdateWeaponAcc(EWeaponPosition Position, EWeaponAccType AccType, AItemWeaponAcc* ItemWeaponAcc) {
+
+	AItemWeapon* Weapon=nullptr;
+
+	switch (Position) {
+	case EWeaponPosition::EWP_Left:
+		if (Weapon1) {
+			Weapon = Weapon1;
+
+		}
+		else {
+			Weapon = HoldGun;
+		}
+
+
+
+		break;
+	case EWeaponPosition::EWP_Right:
+		if (Weapon2) {
+			Weapon = Weapon2;
+
+		}
+		else {
+			Weapon = HoldGun;
+		}
+
+		break;
+	case EWeaponPosition::EWP_MAX:
+
+
+		break;
+	default:
+		break;
+	}
+
+	switch (AccType) {
+	case EWeaponAccType::EWAT_Sight:
+		Weapon->UpdateSight(ItemWeaponAcc);
+
+		break;
+	case EWeaponAccType::EWAT_Muzzle:
+		Weapon->UpdateMuzzle(ItemWeaponAcc);
+
+		break;
+	case EWeaponAccType::EWAT_Foregrip:
+		Weapon->UpdateForegrip(ItemWeaponAcc);
+
+		break;
+	case EWeaponAccType::EWAT_Mag:
+		Weapon->UpdateMag(ItemWeaponAcc);
+
+		break;
+	case EWeaponAccType::EWAT_Buttstock:
+		Weapon->UpdateButtstock(ItemWeaponAcc);
+
+		break;
+	case EWeaponAccType::EWAT_MAX:
+
+
+		break;
+	default:
+		break;
+	}
+
+	bool bCheckValid = 0;
+	if (ItemWeaponAcc) {
+		bCheckValid = 1;
+	}
+	else {
+		bCheckValid = 0;
+	}
+
+	OnWeaponAccChanged.Broadcast(Weapon,!bCheckValid,ItemWeaponAcc,AccType);
+
+
+
+
+
+
 }
 
 
