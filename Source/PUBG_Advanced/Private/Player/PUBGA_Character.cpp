@@ -778,6 +778,8 @@ void APUBGA_Character::UnEquipFinishedNotifyHandle(USkeletalMeshComponent* MyMes
 void APUBGA_Character::FireEndNotifyHandle(USkeletalMeshComponent* MyMesh) {
 
 	if (!PlayerStateRef)return;
+	if (!PlayerControllerRef)return;
+	PlayerStateRef->GetHoldGun()->ChangeBullet();
 
 	if (PlayerStateRef->GetHoldGun()->Ammo == 0) {
 		PlayerControllerRef->ExecuteReload();

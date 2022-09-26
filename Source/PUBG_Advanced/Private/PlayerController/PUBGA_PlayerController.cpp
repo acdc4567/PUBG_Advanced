@@ -197,16 +197,19 @@ void APUBGA_PlayerController::MouseLookUp(float AxisValue) {
 void APUBGA_PlayerController::MoveFwd(float AxisValue) {
 	if (!MyCharacterRef)return;
 	if (!(MyCharacterRef->GetIsProne()&&MyCharacterRef->GetIsAiming())) {
-		if (MoveForwardAxis != AxisValue) {
-			MoveForwardAxis = AxisValue;
-			UpdateCameraHeight();
-			MyCharacterRef->UpdateWeaponDisplay(CalculateHoldGunSocket());
-		}
+		if (!(MyCharacterRef->GetIsPlayingMontage() && MyCharacterRef->GetIsProne())) {
+			if (MoveForwardAxis != AxisValue) {
+				MoveForwardAxis = AxisValue;
+				UpdateCameraHeight();
+				MyCharacterRef->UpdateWeaponDisplay(CalculateHoldGunSocket());
+			}
 
-		if (bEnableMove) {
-			UpdateWalkSpeed();
-			MovingOnTheGround(1, AxisValue, GetControllerRotation());
+			if (bEnableMove) {
+				UpdateWalkSpeed();
+				MovingOnTheGround(1, AxisValue, GetControllerRotation());
+			}
 		}
+		
 	}
 	
 	
@@ -216,20 +219,19 @@ void APUBGA_PlayerController::MoveFwd(float AxisValue) {
 void APUBGA_PlayerController::MoveRt(float AxisValue) {
 	if (!MyCharacterRef)return;
 	if (MyCharacterRef->GetIsProne() && MyCharacterRef->GetIsAiming())return;
+	if (!(MyCharacterRef->GetIsPlayingMontage() && MyCharacterRef->GetIsProne())) {
+		if (MoveRightAxis != AxisValue) {
+			MoveRightAxis = AxisValue;
+			UpdateCameraHeight();
+			MyCharacterRef->UpdateWeaponDisplay(CalculateHoldGunSocket());
+		}
 
-
-	if (MoveRightAxis != AxisValue) {
-		MoveRightAxis = AxisValue;
-		UpdateCameraHeight();
-		MyCharacterRef->UpdateWeaponDisplay(CalculateHoldGunSocket());
+		if (bEnableMove) {
+			UpdateWalkSpeed();
+			MovingOnTheGround(0, AxisValue, GetControllerRotation());
+		}
 	}
 
-	if (bEnableMove) {
-		UpdateWalkSpeed();
-		MovingOnTheGround(0, AxisValue, GetControllerRotation());
-	}
-
-	
 }
 
 
@@ -302,11 +304,14 @@ FRotator APUBGA_PlayerController::GetControllerRotation() {
 void APUBGA_PlayerController::CrouchKeyPressed() {
 	if (!MyCharacterRef)return;
 	if (MyCharacterRef->GetIsProne()) {
-		MyCharacterRef->SetIsProne(0);
-		MyCharacterRef->SetIsCrouching(1);
-		ReleaseFire();
-		ReverseHoldAiming();
-		HandleProneTimeFromTable(3, 2);
+		if (!MyCharacterRef->GetIsPlayingMontage()) {
+			MyCharacterRef->SetIsProne(0);
+			MyCharacterRef->SetIsCrouching(1);
+			ReleaseFire();
+			ReverseHoldAiming();
+			HandleProneTimeFromTable(3, 2);
+		}
+		
 	}
 	else {
 		if (MyCharacterRef->GetIsCrouching()) {
@@ -326,33 +331,37 @@ void APUBGA_PlayerController::CrouchKeyPressed() {
 
 void APUBGA_PlayerController::ProneKeyPressed() {
 	if (!MyCharacterRef)return;
-	if (MyCharacterRef->GetIsProne()) {
-		MyCharacterRef->SetIsProne(0);
-		ReverseHoldAiming();
-		ReleaseFire();
-		HandleProneTimeFromTable(3, 1);
-	}
-	else {
-		if (MyCharacterRef->GetIsCrouching()) {
-			MyCharacterRef->SetIsAiming(0);
-			MyCharacterRef->SetIsCrouching(0);
-			MyCharacterRef->SetIsProne(1);
+	if (!MyCharacterRef->GetIsPlayingMontage()) {
+		if (MyCharacterRef->GetIsProne()) {
+			MyCharacterRef->SetIsProne(0);
 			ReverseHoldAiming();
 			ReleaseFire();
-			HandleProneTimeFromTable(3, 2);
+			HandleProneTimeFromTable(3, 1);
 		}
 		else {
-			MyCharacterRef->SetIsAiming(0);
-			MyCharacterRef->SetIsProne(1);
-			ReverseHoldAiming();
-			ReleaseFire();
-			HandleProneTimeFromTable(1, 3);
+			if (MyCharacterRef->GetIsCrouching()) {
+				MyCharacterRef->SetIsAiming(0);
+				MyCharacterRef->SetIsCrouching(0);
+				MyCharacterRef->SetIsProne(1);
+				ReverseHoldAiming();
+				ReleaseFire();
+				HandleProneTimeFromTable(3, 2);
+			}
+			else {
+				MyCharacterRef->SetIsAiming(0);
+				MyCharacterRef->SetIsProne(1);
+				ReverseHoldAiming();
+				ReleaseFire();
+				HandleProneTimeFromTable(1, 3);
+			}
 		}
-	}
-	
-	UpdateCameraHeight();
-	MyCharacterRef->UpdateWeaponDisplay(CalculateHoldGunSocket());
 
+		UpdateCameraHeight();
+		MyCharacterRef->UpdateWeaponDisplay(CalculateHoldGunSocket());
+
+	}
+
+	
 }
 
 void APUBGA_PlayerController::AimKeyPressed() {
@@ -434,10 +443,13 @@ void APUBGA_PlayerController::JumpKeyPressed() {
 
 
 	if (MyCharacterRef->GetIsProne()) {
-		MyCharacterRef->SetIsProne(0);
-		MyCharacterRef->SetIsCrouching(1);
-		ReleaseFire();
-		ReverseHoldAiming();
+		if (!MyCharacterRef->GetIsPlayingMontage()) {
+			MyCharacterRef->SetIsProne(0);
+			MyCharacterRef->SetIsCrouching(1);
+			ReleaseFire();
+			ReverseHoldAiming();
+		}
+		
 	}
 	else {
 		if (MyCharacterRef->GetIsCrouching()) {
@@ -641,7 +653,11 @@ void APUBGA_PlayerController::RunKeyPressed() {
 		}
 		else {
 			ReverseHoldAiming();
-			bRunPressed = 1;
+			if (!MyCharacterRef->GetIsPlayingMontage() || !(MyCharacterRef->GetPlayingMontageType() == EMontageType::EMT_Reload || MyCharacterRef->GetPlayingMontageType() == EMontageType::EMT_ReloadBullet)) {
+				bRunPressed = 1;
+			}
+
+			
 		}
 	}
 	
@@ -1575,10 +1591,14 @@ void APUBGA_PlayerController::TakeBackKeyPressed() {
 	if (!PlayerStateRef)return;
 	if (!MyCharacterRef)return;
 	if (PlayerStateRef->GetHoldGun()) {
-		ReleaseFire();
-		MyCharacterRef->SetIsAiming(0);
-		ReverseHoldAiming();
-		MyCharacterRef->PlayMontage(EMontageType::EMT_UnEquip);
+		if (!MyCharacterRef->GetIsPlayingMontage() || !(MyCharacterRef->GetPlayingMontageType() == EMontageType::EMT_Reload || MyCharacterRef->GetPlayingMontageType() == EMontageType::EMT_ReloadBullet || MyCharacterRef->GetPlayingMontageType() == EMontageType::EMT_UnEquip)) {
+			ReleaseFire();
+			MyCharacterRef->SetIsAiming(0);
+			ReverseHoldAiming();
+			MyCharacterRef->PlayMontage(EMontageType::EMT_UnEquip);
+		}
+		
+		
 	}
 }
 
@@ -1612,15 +1632,19 @@ void APUBGA_PlayerController::Keyboard1KeyPressed() {
 	if (!MyCharacterRef)return;
 	ReadyEquipWeapon = PlayerStateRef->GetWeapon1();
 	if (ReadyEquipWeapon) {
-		MyCharacterRef->SetIsAiming(0);
-		ReverseHoldAiming();
-		if (PlayerStateRef->GetHoldGun()) {
-			ReleaseFire();
-			MyCharacterRef->PlayMontage(EMontageType::EMT_UnEquip);
+
+		if (!MyCharacterRef->GetIsPlayingMontage() || !(MyCharacterRef->GetPlayingMontageType() == EMontageType::EMT_Reload || MyCharacterRef->GetPlayingMontageType() == EMontageType::EMT_ReloadBullet || MyCharacterRef->GetPlayingMontageType() == EMontageType::EMT_UnEquip || MyCharacterRef->GetPlayingMontageType() == EMontageType::EMT_Equip)) {
+			MyCharacterRef->SetIsAiming(0);
+			ReverseHoldAiming();
+			if (PlayerStateRef->GetHoldGun()) {
+				ReleaseFire();
+				MyCharacterRef->PlayMontage(EMontageType::EMT_UnEquip);
+			}
+			else {
+				MyCharacterRef->PlayMontage(EMontageType::EMT_Equip);
+			}
 		}
-		else {
-			MyCharacterRef->PlayMontage(EMontageType::EMT_Equip);
-		}
+		
 	}
 
 
@@ -1632,15 +1656,19 @@ void APUBGA_PlayerController::Keyboard2KeyPressed() {
 	if (!PlayerStateRef)return;
 	ReadyEquipWeapon = PlayerStateRef->GetWeapon2();
 	if (ReadyEquipWeapon) {
-		MyCharacterRef->SetIsAiming(0);
-		ReverseHoldAiming();
-		if (PlayerStateRef->GetHoldGun()) {
-			ReleaseFire();
-			MyCharacterRef->PlayMontage(EMontageType::EMT_UnEquip);
+		if (!MyCharacterRef->GetIsPlayingMontage() || !(MyCharacterRef->GetPlayingMontageType() == EMontageType::EMT_Reload || MyCharacterRef->GetPlayingMontageType() == EMontageType::EMT_ReloadBullet || MyCharacterRef->GetPlayingMontageType() == EMontageType::EMT_UnEquip || MyCharacterRef->GetPlayingMontageType() == EMontageType::EMT_Equip)) {
+			MyCharacterRef->SetIsAiming(0);
+			ReverseHoldAiming();
+			if (PlayerStateRef->GetHoldGun()) {
+				ReleaseFire();
+				MyCharacterRef->PlayMontage(EMontageType::EMT_UnEquip);
+			}
+			else {
+				MyCharacterRef->PlayMontage(EMontageType::EMT_Equip);
+			}
 		}
-		else {
-			MyCharacterRef->PlayMontage(EMontageType::EMT_Equip);
-		}
+
+		
 	}
 }
 
@@ -2121,15 +2149,13 @@ void APUBGA_PlayerController::FireKeyPressed() {
 	if (!PlayerStateRef)return;
 	if (!MyCharacterRef)return;
 	if (PlayerStateRef->GetHoldGun() && !(MyCharacterRef->GetCharacterMovement()->Velocity.Size() != 0.f && MyCharacterRef->GetIsProne()) && bEnableMove && !bAltPressed && !MyCharacterRef->GetCharacterMovement()->IsFalling()) {
-		if (!MyCharacterRef->GetIsPlayingMontage()||MyCharacterRef->GetPlayingMontageType()==EMontageType::EMT_Fire) {
-			PlayerStateRef->GetHoldGun()->PressFire();
+		if (!PlayerStateRef->GetHoldGun()->bNeedReloadBullet) {
+			if (!MyCharacterRef->GetIsPlayingMontage() || MyCharacterRef->GetPlayingMontageType() == EMontageType::EMT_Fire) {
+				PlayerStateRef->GetHoldGun()->PressFire();
+			}
 		}
 		
-	
 	}
-
-	
-
 
 }
 
@@ -2187,6 +2213,17 @@ void APUBGA_PlayerController::Event_ReloadEnd() {
 	if (!PlayerStateRef)return;
 	if (MyCharacterRef->GetPlayingMontageType()==EMontageType::EMT_Reload) {
 		PlayerStateRef->GetHoldGun()->FilledClip();
+		PlayerStateRef->GetHoldGun()->bNeedReloadBullet = 0;
+	}
+	else {
+		PlayerStateRef->GetHoldGun()->bNeedReloadBullet = 0;
+		bool bTemp = !MyCharacterRef->GetIsProne();
+		MyCharacterRef->SetIsAiming(bTemp);
+		if (PlayerStateRef->GetHoldGun()->bSightOpen) {
+			MyCharacterRef->HoldAiming(1);
+			MyCharacterRef->SetIsSighAiming(1);
+		}
+		MyCharacterRef->UpdateWeaponDisplay(CalculateHoldGunSocket());
 	}
 
 

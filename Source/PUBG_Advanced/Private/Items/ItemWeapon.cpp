@@ -287,7 +287,11 @@ void AItemWeapon::AutoFire() {
 				}
 				Ammo -= 1;
 				FireTime = GetWorld()->GetTimeSeconds();
-				MyCharacterRef->SetIsAiming(1);
+				if (Datas->ReplaceBulletTime>0.f) {
+					bNeedReloadBullet = 1;
+				}
+				bool bTemp = !(MyCharacterRef->GetIsProne() && !MyCharacterRef->GetIsSightAiming());
+				MyCharacterRef->SetIsAiming(bTemp);
 				
 				MyCharacterRef->UpdateWeaponDisplay(PlayerControllerRef->CalculateHoldGunSocket());
 				if (MyCharacterRef->GetIsSightAiming()) {
@@ -361,6 +365,7 @@ void AItemWeapon::ReloadClip() {
 	if (!MyCharacterRef)return;
 	if (!PlayerControllerRef)return;
 	if (CheckAmmoAmount() > 0) {
+		PlayerControllerRef->SetRunPressed(0);
 		float ReloadRate = 0.f;
 		if (AccMagObj) {
 			ReloadRate = AccMagObj->Datas->ClipRate * Datas->ReplaceClipTime;
@@ -403,6 +408,31 @@ void AItemWeapon::FilledClip() {
 	PlayerStateRef->UpdateAmmoAmount(Datas->UseAmmoID, 0, NeedAmount);
 	
 }
+
+void AItemWeapon::ChangeBullet() {
+	if (!PlayerControllerRef)return;
+	if (!MyCharacterRef)return;
+	if (Datas->ReplaceBulletTime > 0.f) {
+		if (Ammo > 0) {
+			bSightOpen = MyCharacterRef->GetIsSightAiming();
+			PlayerControllerRef->ReverseHoldAiming();
+			MyCharacterRef->PlayMontage(EMontageType::EMT_ReloadBullet);
+		}
+	}
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
 
 
 

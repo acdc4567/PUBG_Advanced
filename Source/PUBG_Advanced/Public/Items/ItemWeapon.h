@@ -109,6 +109,9 @@ protected:
 
 	int32 CheckAmmoAmount();
 
+	
+
+
 public:
 
 	UFUNCTION(BlueprintCallable)
@@ -162,6 +165,19 @@ public:
 	void ReloadClip();
 
 	void FilledClip();
+
+	void ChangeBullet();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = MyPlayerState)
+		bool bSightOpen = 0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = MyPlayerState)
+		bool bNeedReloadBullet = 0;
+
+
+
+
+
 
 
 

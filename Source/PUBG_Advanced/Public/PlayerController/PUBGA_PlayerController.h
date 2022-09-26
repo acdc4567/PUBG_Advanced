@@ -406,6 +406,8 @@ public:
 
 	void ExecuteReload();
 
+	FORCEINLINE void SetRunPressed(bool bValue) { bRunPressed = bValue; }
+
 
 
 };
