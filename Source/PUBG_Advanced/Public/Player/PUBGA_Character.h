@@ -189,8 +189,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = AimsAccurately)
 		bool bIsAimAccurate = 0;
 
-
-
+	
 
 
 private:
@@ -293,6 +292,14 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = CameraRestore)
 		void SetIsSighAiming(bool bIsSighAiming);
 
+	UFUNCTION(BlueprintImplementableEvent, Category = CameraShakes)
+		void PlayCamShake(bool bIsAR);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = CameraShakes)
+		void AddRecoil(float ReadyYaw,float ReadyPitch,float FiringInterval,float FireInterval);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = CameraShakes)
+		void AdddedPerToZero();
 
 
 

@@ -2235,7 +2235,11 @@ void APUBGA_PlayerController::ExecuteReload() {
 	ReloadKeyPressed();
 }
 
+void APUBGA_PlayerController::RecoilInput(float YawVal, float PitchVal) {
+	AddPitchInput(PitchVal);
+	AddYawInput(YawVal);
 
+}
 
 
 

@@ -286,6 +286,7 @@ void AItemWeapon::AutoFire() {
 					PlayFiringFlash();
 				}
 				Ammo -= 1;
+				FireInterval = GetWorld()->GetTimeSeconds() - FireTime;
 				FireTime = GetWorld()->GetTimeSeconds();
 				if (Datas->ReplaceBulletTime>0.f) {
 					bNeedReloadBullet = 1;
@@ -302,9 +303,34 @@ void AItemWeapon::AutoFire() {
 					MyCharacterRef->PlayMontage(EMontageType::EMT_Fire);
 				}
 
+				if (Datas->ReplaceBulletTime > 0.f) {
+					MyCharacterRef->PlayCamShake(0);
+				}
+				else {
+					MyCharacterRef->PlayCamShake(1);
+				}
+				int32 RandomInt32=0;
+				if (FMath::RandBool()) {
+					RandomInt32 = 1;
+				}
+				else {
+					RandomInt32 = 0;
+				}
+				float fMultiplier = 0.f;
 
+				if (FireInterval<.4f) {
+					fMultiplier = 2.f;
+				}
+				else {
+					fMultiplier = .1f;
+				}
+				float HPer, VPer;
+				CalculateOffsetPer(HPer, VPer);
 
-
+				ReadyYaw = RandomInt32 * Datas->HorizontalOffset * (1 - HPer);
+				ReadyPitch = fMultiplier * Datas->VerticalOffset * (1 - VPer);
+				MyCharacterRef->AdddedPerToZero();
+				MyCharacterRef->AddRecoil(ReadyYaw, ReadyPitch, Datas->FiringInterval,FireInterval);
 
 			}
 			else {
@@ -427,7 +453,27 @@ void AItemWeapon::ChangeBullet() {
 
 
 
+void AItemWeapon::CalculateOffsetPer(float& Vertical, float& Horizontal) {
+	float VerticalPer = 0.f;
+	float HorizontalPer = 0.f;
+	if (AccMuzzleObj) {
+		VerticalPer = AccMuzzleObj->Datas->VerticalAdjPer;
+		HorizontalPer = AccMuzzleObj->Datas->HorizontalAdjPer;
+	}
+	if (AccForegripObj) {
+		VerticalPer += AccForegripObj->Datas->VerticalAdjPer;
+		HorizontalPer += AccForegripObj->Datas->HorizontalAdjPer;
+	}
+	if (AccButtstockObj) {
+		VerticalPer += AccButtstockObj->Datas->VerticalAdjPer;
+		HorizontalPer += AccButtstockObj->Datas->HorizontalAdjPer;
+	}
+	Vertical = VerticalPer;
+	Horizontal = HorizontalPer;
 
+
+
+}
 
 
 

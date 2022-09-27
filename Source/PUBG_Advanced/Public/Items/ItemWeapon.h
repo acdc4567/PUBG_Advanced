@@ -15,6 +15,8 @@ class UParticleSystemComponent;
 class APUBGA_Character;
 class APUBGA_PlayerState;
 class APUBGA_PlayerController;
+
+
 /**
  * 
  */
@@ -109,7 +111,7 @@ protected:
 
 	int32 CheckAmmoAmount();
 
-	
+	void CalculateOffsetPer(float & Vertical,float & Horizontal);
 
 
 public:
@@ -173,6 +175,17 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = MyPlayerState)
 		bool bNeedReloadBullet = 0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = MyPlayerState)
+		float ReadyYaw = 0.f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = MyPlayerState)
+		float ReadyPitch = 0.f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = MyPlayerState)
+		float FireInterval = 0.f;
+
+
 
 
 

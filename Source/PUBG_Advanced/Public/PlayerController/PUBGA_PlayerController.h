@@ -408,6 +408,13 @@ public:
 
 	FORCEINLINE void SetRunPressed(bool bValue) { bRunPressed = bValue; }
 
+	UFUNCTION(BlueprintCallable)
+		void RecoilInput(float YawVal,float PitchVal);
+
+
+
+
+
 
 
 };
