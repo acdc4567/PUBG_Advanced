@@ -15,6 +15,7 @@ class UParticleSystemComponent;
 class APUBGA_Character;
 class APUBGA_PlayerState;
 class APUBGA_PlayerController;
+class ABulletProjectile;
 
 
 /**
@@ -112,6 +113,18 @@ protected:
 	int32 CheckAmmoAmount();
 
 	void CalculateOffsetPer(float & Vertical,float & Horizontal);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Components)
+		TSubclassOf<ABulletProjectile> ProjectileClass;
+
+	FTransform GetBulletInitTransform();
+
+
+
+
+
+
+
 
 
 public:

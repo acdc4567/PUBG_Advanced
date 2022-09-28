@@ -19,6 +19,7 @@ class APickUpBase;
 class APUBGA_PlayerState;
 class AItemWeapon;
 class UAnimMontage;
+class ABulletProjectile;
 
 
 
@@ -301,6 +302,8 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = CameraShakes)
 		void AdddedPerToZero();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Components)
+		TSubclassOf<ABulletProjectile> ProjectileClass;
 
 
 };

@@ -411,8 +411,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void RecoilInput(float YawVal,float PitchVal);
 
+	FORCEINLINE bool GetIsHoldAiming() const { return bHoldAiming; }
 
+	FORCEINLINE float GetMoveForwardAxis() const { return MoveForwardAxis; }
+	FORCEINLINE float GetMoveRightAxis() const { return MoveRightAxis; }
 
+	FORCEINLINE float GetRightPressedTime() const { return RightPressedTime; }
 
 
 

@@ -23,6 +23,7 @@
 #include "Animation/Notifies/FireEndAnimNotify.h"
 #include "Animation/Notifies/ReloadEndAnimNotify.h"
 #include "Items/ItemWeaponAcc.h"
+#include "Bullets/BulletProjectile.h"
 
 
 

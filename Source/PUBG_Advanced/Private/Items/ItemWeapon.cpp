@@ -11,6 +11,9 @@
 #include "PlayerController/PUBGA_PlayerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Bullets/BulletProjectile.h"
+#include "Camera/CameraComponent.h"
+#include "Engine/SkeletalMeshSocket.h"
 
 
 
@@ -105,7 +108,7 @@ void AItemWeapon::BeginPlay() {
 		PlayerStateRef= MyCharacterRef->GetPlayerStateRef();
 		
 		PlayerControllerRef = Cast<APUBGA_PlayerController>(UGameplayStatics::GetPlayerController(this,0));
-		
+		ProjectileClass = MyCharacterRef->ProjectileClass;
 	}
 
 
@@ -331,6 +334,19 @@ void AItemWeapon::AutoFire() {
 				ReadyPitch = fMultiplier * Datas->VerticalOffset * (1 - VPer);
 				MyCharacterRef->AdddedPerToZero();
 				MyCharacterRef->AddRecoil(ReadyYaw, ReadyPitch, Datas->FiringInterval,FireInterval);
+				
+				FTransform SpawnTransform = GetBulletInitTransform();
+				ABulletProjectile* Projectile = GetWorld()->SpawnActorDeferred<ABulletProjectile>(ProjectileClass, SpawnTransform);
+				if (Projectile) {
+					Projectile->InitVelocity = Datas->InitVelocity;
+					Projectile->f100MVelocity = Datas->f100MVelocity;
+					Projectile->f300MVelocity = Datas->f300MVelocity;
+					Projectile->f500MVelocity = Datas->f500MVelocity;
+
+
+					Projectile->FinishSpawning(SpawnTransform);
+				}
+
 
 			}
 			else {
@@ -473,6 +489,84 @@ void AItemWeapon::CalculateOffsetPer(float& Vertical, float& Horizontal) {
 
 
 
+}
+
+FTransform AItemWeapon::GetBulletInitTransform() {
+	if(!MyCharacterRef)return FTransform();
+	if (!PlayerControllerRef)return FTransform();
+
+	float OffsetMin = 0.f;
+	float OffsetMax = 0.f;
+	int32 Multiplier = 0;
+
+
+	if (!MyCharacterRef->GetIsSightAiming()) {
+		if (PlayerControllerRef->GetIsHoldAiming()) {
+			if (PlayerControllerRef->GetMoveForwardAxis() == 0.f && PlayerControllerRef->GetMoveRightAxis() == 0.f) {
+				OffsetMin = Datas->CrossOffset_Min_AimStillness;
+				OffsetMax = Datas->CrossOffset_Max_AimStillness;
+			}
+			else {
+				OffsetMin = Datas->CrossOffset_Min_AimMove;
+				OffsetMax = Datas->CrossOffset_Max_AimMove;
+			}
+		}
+		else {
+			if (PlayerControllerRef->GetMoveForwardAxis() == 0.f && PlayerControllerRef->GetMoveRightAxis() == 0.f) {
+				OffsetMin = Datas->CrossOffset_Min_Stillness;
+				OffsetMax = Datas->CrossOffset_Max_Stillness;
+			}
+			else {
+				OffsetMin = Datas->CrossOffset_Min_Move;
+				OffsetMax = Datas->CrossOffset_Max_Move;
+			}
+		}
+
+		FTransform RetTransform;
+		FVector SpawnVector = MyCharacterRef->GetFollowCamera()->GetForwardVector() * 300.f + MyCharacterRef->GetFollowCamera()->GetComponentLocation();
+		float RightOffsetFloat = FMath::RandRange(OffsetMin, OffsetMax);
+		FVector RightOffset = MyCharacterRef->GetFollowCamera()->GetRightVector() * RightOffsetFloat;
+		SpawnVector += RightOffset;
+		float UpOffsetFloat = FMath::RandRange(OffsetMin, OffsetMax);
+		FVector UpOffset = MyCharacterRef->GetFollowCamera()->GetUpVector() * UpOffsetFloat;
+		SpawnVector += UpOffset;
+		RetTransform.SetLocation(SpawnVector);
+		FRotator SpawnRotation = MyCharacterRef->GetControlRotation();
+		FQuat SpawnQuat = SpawnRotation.Quaternion();
+		RetTransform.SetRotation(SpawnQuat);
+		RetTransform.SetScale3D(FVector(1.f));
+
+		return RetTransform;
+
+
+
+	}
+	else {
+		if (AccSightObj) {
+			Multiplier = AccSightObj->Datas->SightMultiple;
+		}
+		else {
+			Multiplier = 0;
+		}
+
+		
+		FName SocksName;
+		if (Multiplier==0) {
+			SocksName = "Socket_BulletDefault";
+		}
+		else if (Multiplier == 1) {
+			SocksName = "Socket_Bullet1x";
+		}
+		else if (Multiplier == 4) {
+			SocksName = "Socket_Bullet4x";
+		}
+		const USkeletalMeshSocket* GunSocket = SkeletalMesh->GetSocketByName(SocksName);
+		return GunSocket->GetSocketTransform(SkeletalMesh);
+
+
+	}
+	
+	return FTransform();
 }
 
 
