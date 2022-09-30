@@ -42,6 +42,11 @@ public:
 
 	FSTR_ItemWeapon* Datas = nullptr;
 
+	FSTR_ItemWeapon Datas1;
+
+	UFUNCTION(BlueprintPure)
+		FORCEINLINE FSTR_ItemWeapon GetDatas() const { return Datas1; }
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
 		AItemWeaponAcc* AccMagObj;
 

@@ -117,9 +117,11 @@ public:
 
 	//Getters
 
-	AItemWeapon* GetWeapon1();
+	UFUNCTION(BlueprintPure)
+		AItemWeapon* GetWeapon1();
 
-	AItemWeapon* GetWeapon2();
+	UFUNCTION(BlueprintPure)
+		AItemWeapon* GetWeapon2();
 
 	UFUNCTION(BlueprintPure)
 		AItemWeapon* GetHoldGun();

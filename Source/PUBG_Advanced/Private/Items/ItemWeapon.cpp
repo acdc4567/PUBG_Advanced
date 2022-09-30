@@ -66,6 +66,10 @@ void AItemWeapon::OnConstruction(const FTransform& Transform) {
 
 	if (ItemWeaponRow) {
 		Datas = ItemWeaponRow;
+		Datas1.Name = Datas->Name;
+		Datas1.Thumbnail = Datas->Thumbnail;
+		Datas1.UseAmmoID = Datas->UseAmmoID;
+
 		Init(EItemType::EIT_Weapon,ItemWeaponRow->Name);
 
 		SkeletalMesh->SetSkeletalMesh(ItemWeaponRow->SkeletalMesh);
