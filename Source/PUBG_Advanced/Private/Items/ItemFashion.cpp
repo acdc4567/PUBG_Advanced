@@ -16,6 +16,7 @@ void AItemFashion::OnConstruction(const FTransform& Transform) {
 	ItemFashionRow = ItemFashionTableObject->FindRow<FSTR_ItemFashion>(ID, TEXT(""));
 	if (ItemFashionRow) {
 		Datas = ItemFashionRow;
+		Datas1.Icon = Datas->Icon;
 		FashionType = Datas->Type;
 		Init(EItemType::EIT_Fashion, Datas->Name);
 		

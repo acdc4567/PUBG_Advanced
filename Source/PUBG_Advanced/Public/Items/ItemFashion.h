@@ -23,7 +23,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
 		EFashionType FashionType;
 
+	FSTR_ItemFashion Datas1;
 
+	UFUNCTION(BlueprintPure)
+		FORCEINLINE FSTR_ItemFashion GetDatas() const { return Datas1; }
 
 protected:
 	FString ItemFashionTablePath;

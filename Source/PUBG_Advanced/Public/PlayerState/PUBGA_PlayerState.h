@@ -93,20 +93,26 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 		FOnWeaponChangedSignature OnWeaponChanged;
 
-	FOnAmmoChangedSignature OnAmmoChanged;
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+		FOnAmmoChangedSignature OnAmmoChanged;
 
-	FOnHealthChangedSignature OnHealthChanged;
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+		FOnHealthChangedSignature OnHealthChanged;
 
-	FOnEnergyChangedSignature OnEnergyChanged;
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+		FOnEnergyChangedSignature OnEnergyChanged;
 
-	FOnEquipmentChangedSignature OnEquipmentChanged;
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+		FOnEquipmentChangedSignature OnEquipmentChanged;
 
-	FOnFashionChangedSignature OnFashionChanged;
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+		FOnFashionChangedSignature OnFashionChanged;
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 		FOnItemsChangedSignature OnItemsChanged;
 
-	FOnWeaponAccChangedSignature OnWeaponAccChanged;
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+		FOnWeaponAccChangedSignature OnWeaponAccChanged;
 
 
 	//Getters
@@ -128,9 +134,11 @@ public:
 
 	float GetEnergyPoint();
 
-	TArray<AItemBase*> GetEquipments();
+	UFUNCTION(BlueprintPure)
+		TArray<AItemBase*> GetEquipments();
 
-	TArray<AItemBase*> GetFashions();
+	UFUNCTION(BlueprintPure)
+		TArray<AItemBase*> GetFashions();
 
 	UFUNCTION(BlueprintCallable)
 		TArray<AItemBase*> GetItems();
@@ -165,7 +173,7 @@ public:
 	bool RemoveItem(AItemBase* Item);
 
 	UFUNCTION(BlueprintCallable)
-	bool CheckBackpackCapacity(int32 AddWeight);
+		bool CheckBackpackCapacity(int32 AddWeight);
 
 	void UpdateAmmoObject();
 
