@@ -15,6 +15,11 @@ class APUBGA_PlayerState;
 class APUBGA_GameModeBase;
 class APickUpWeapon;
 class AItemWeapon;
+class UInventory_UserWidget;
+class UI_Vicinity_UserWidget;
+
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemsInRangeChangeSignature, bool, bIsOnHand);
 
 
 /**
@@ -36,6 +41,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	FName GenerateSN();
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnItemsInRangeChangeSignature ItemsInRangeChangeSignature;
 
 
 protected:
@@ -320,6 +328,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = WeaponAiming)
 		float AimAccuratelyRemaining = 0.f;
 
+	bool bInventoryUIState = 0;
+
 	void UpdateAccurateRemaining(float Delta);
 
 	void ShootModeKeyPressed();
@@ -334,7 +344,27 @@ protected:
 
 	void ReloadKeyPressed();
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = UserInterfaces)
+		UInventory_UserWidget* InventoryUI;
 
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = UserInterfaces)
+		TSubclassOf<UInventory_UserWidget> PlayerInventoryWidgetClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = UserInterfaces)
+		UI_Vicinity_UserWidget* VicinityUI;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = UserInterfaces)
+		TSubclassOf<UI_Vicinity_UserWidget> PlayerVicinityWidgetClass;
+
+	void InventoryKeyPressed();
+	void Inventory1KeyPressed();
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void SetupInputModeGameAndUI();
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void SetupInputModeGameOnly();
 
 
 
@@ -398,7 +428,12 @@ public:
 
 	FName CalculateHoldGunSocket();
 
+	UFUNCTION(BlueprintPure)
 	FORCEINLINE APUBGA_PlayerState* GetPlayerStateRef() const { return PlayerStateRef; }
+
+	UFUNCTION(BlueprintCallable)
+		TArray<APickUpBase*>  GetItemsInRange() const; 
+
 
 	void ReverseHoldAiming();
 

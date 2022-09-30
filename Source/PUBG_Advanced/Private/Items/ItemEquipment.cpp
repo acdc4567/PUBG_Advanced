@@ -24,6 +24,9 @@ void AItemEquipment::OnConstruction(const FTransform& Transform) {
 	if (ItemEquipmentRow) {
 
 		Datas = ItemEquipmentRow;
+		Datas1.Name = Datas->Name;
+		Datas1.Icon = Datas->Icon;
+		
 		Init(ItemEquipmentRow->Type, ItemEquipmentRow->Name);
 	
 		StaticMeshx2->SetStaticMesh(ItemEquipmentRow->StaticMesh);

@@ -22,6 +22,16 @@ public:
 	AItemBoost();
 
 	virtual int32 GetWeight() override;
+	
+	FSTR_ItemBoost* Datas = nullptr;
+
+	FSTR_ItemBoost Datas1;
+
+	UFUNCTION(BlueprintPure)
+		FORCEINLINE FSTR_ItemBoost GetDatas() const { return Datas1; }
+
+
+
 protected:
 	FString ItemBoostTablePath;
 
@@ -29,8 +39,7 @@ protected:
 
 	virtual void OnConstruction(const FTransform& Transform) override;
 
-	FSTR_ItemBoost* Datas = nullptr;
-
+	
 
 	
 

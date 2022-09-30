@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Items/PickUpBase.h"
 #include "PUBGA_Enums.h"
+#include "PUBGA_Structs.h"
 #include "Engine/DataTable.h"
 #include "PickUpWeapon.generated.h"
 
@@ -25,6 +26,16 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Publics, meta = (ExposeOnSpawn = "true"))
 		int32 Ammo;
 
+	
+	FSTR_ItemWeapon* Datas;
+
+	UPROPERTY(VisibleAnywhere, Category = Publics)
+		FSTR_ItemWeapon Datas1;
+
+	UFUNCTION(BlueprintPure)
+		FSTR_ItemWeapon GetDatas() const;
+
+
 protected:
 
 	FString ItemWeaponTablePath;
@@ -34,7 +45,7 @@ protected:
 
 	virtual void OnConstruction(const FTransform& Transform) override;
 
-
+	
 
 
 

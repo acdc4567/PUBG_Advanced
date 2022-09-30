@@ -6,6 +6,7 @@
 #include "Items/PickUpBase.h"
 #include "PUBGA_Enums.h"
 #include "Engine/DataTable.h"
+#include "PUBGA_Structs.h"
 #include "PickUpBoost.generated.h"
 
 /**
@@ -25,6 +26,15 @@ public:
 		int32 SingleWeight;
 
 	virtual int32 GetWeight() override;
+
+	FSTR_ItemBoost* Datas = nullptr;
+
+	FSTR_ItemBoost Datas1;
+
+	UFUNCTION(BlueprintPure)
+		FORCEINLINE FSTR_ItemBoost GetDatas() const { return Datas1; }
+
+
 
 protected:
 

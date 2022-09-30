@@ -103,7 +103,8 @@ public:
 
 	FOnFashionChangedSignature OnFashionChanged;
 
-	FOnItemsChangedSignature OnItemsChanged;
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+		FOnItemsChangedSignature OnItemsChanged;
 
 	FOnWeaponAccChangedSignature OnWeaponAccChanged;
 
@@ -163,6 +164,7 @@ public:
 
 	bool RemoveItem(AItemBase* Item);
 
+	UFUNCTION(BlueprintCallable)
 	bool CheckBackpackCapacity(int32 AddWeight);
 
 	void UpdateAmmoObject();
@@ -175,6 +177,15 @@ public:
 
 	int32 GetAmmoAmount(FName IDName);
 
+	int32 TotalCapacityOfBP = 0;
+	int32 ItemsWeightTot = 0;
+
+	UFUNCTION(BlueprintCallable)
+		FORCEINLINE int32 GetTotalCapacityOfBP() const { return TotalCapacityOfBP; }
+
+
+	UFUNCTION(BlueprintCallable)
+		FORCEINLINE int32 GetItemsWeightTot() const { return ItemsWeightTot; }
 
 
 };

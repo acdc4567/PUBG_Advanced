@@ -31,6 +31,11 @@ protected:
 
 	FSTR_ItemEquipment* Datas = nullptr;
 
+	FSTR_ItemEquipment Datas1;
+
+	UFUNCTION(BlueprintPure)
+		FORCEINLINE FSTR_ItemEquipment GetDatas() const { return Datas1; }
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
 		UStaticMeshComponent* StaticMeshx2;
 

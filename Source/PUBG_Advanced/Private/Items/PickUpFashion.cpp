@@ -2,7 +2,6 @@
 
 
 #include "Items/PickUpFashion.h"
-#include "PUBGA_Structs.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 
@@ -32,6 +31,9 @@ void APickUpFashion::OnConstruction(const FTransform& Transform) {
 	FSTR_ItemFashion* ItemFashionRow = nullptr;
 	ItemFashionRow = ItemFashionTableObject->FindRow<FSTR_ItemFashion>(ID, TEXT(""));
 	if (ItemFashionRow) {
+		Datas = ItemFashionRow;
+		Datas1.Name = Datas->Name;
+		Datas1.Icon = Datas->Icon;
 		FashionType = ItemFashionRow->Type;
 
 		InitPickup(EItemType::EIT_Fashion, ItemFashionRow->Name, "EQUIP ", ItemFashionRow->StaticMesh);

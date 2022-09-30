@@ -2,7 +2,6 @@
 
 
 #include "Items/PickUpAmmo.h"
-#include "PUBGA_Structs.h"
 
 APickUpAmmo::APickUpAmmo() {
 
@@ -18,6 +17,9 @@ void APickUpAmmo::OnConstruction(const FTransform& Transform) {
 	ItemAmmoRow = ItemAmmoTableObject->FindRow<FSTR_ItemAmmo>(ID, TEXT(""));
 
 	if (ItemAmmoRow) {
+		Datas = ItemAmmoRow;
+		Datas1.Name = Datas->Name;
+		Datas1.Icon = Datas->Icon;
 		if (Amount == 0) {
 			Amount = ItemAmmoRow->PickupAmount;
 			
@@ -39,6 +41,7 @@ int32 APickUpAmmo::GetWeight() {
 	ItemAmmoRow = ItemAmmoTableObject->FindRow<FSTR_ItemAmmo>(ID, TEXT(""));
 
 	if (ItemAmmoRow) {
+		
 		return Amount * SingleWeight;
 	}
 

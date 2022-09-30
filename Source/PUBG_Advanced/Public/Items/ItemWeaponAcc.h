@@ -23,6 +23,11 @@ public:
 
 	FSTR_ItemWeaponAcc* Datas = nullptr;
 
+	FSTR_ItemWeaponAcc Datas1;
+
+	UFUNCTION(BlueprintPure)
+		FORCEINLINE FSTR_ItemWeaponAcc GetDatas() const { return Datas1; }
+
 	virtual int32 GetWeight() override;
 
 	EWeaponAccType AccType;

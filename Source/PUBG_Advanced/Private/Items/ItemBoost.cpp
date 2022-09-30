@@ -15,7 +15,8 @@ void AItemBoost::OnConstruction(const FTransform& Transform) {
 	ItemBoostRow = ItemBoostTableObject->FindRow<FSTR_ItemBoost>(ID, TEXT(""));
 	if (ItemBoostRow) {
 		Datas = ItemBoostRow;
-
+		Datas1.Name = Datas->Name;
+		Datas1.Icon = Datas->Icon;
 		Init(EItemType::EIT_Boost, Datas->Name);
 		UseTime = Datas->UseTime;
 

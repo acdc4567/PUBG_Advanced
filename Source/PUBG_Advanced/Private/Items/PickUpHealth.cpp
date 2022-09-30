@@ -2,7 +2,6 @@
 
 
 #include "Items/PickUpHealth.h"
-#include "PUBGA_Structs.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 APickUpHealth::APickUpHealth() {
@@ -26,6 +25,9 @@ void APickUpHealth::OnConstruction(const FTransform& Transform) {
 	FSTR_ItemHealth* ItemHealthRow = nullptr;
 	ItemHealthRow = ItemHealthTableObject->FindRow<FSTR_ItemHealth>(ID, TEXT(""));
 	if (ItemHealthRow) {
+		Datas = ItemHealthRow;
+		Datas1.Name = Datas->Name;
+		Datas1.Icon = Datas->Icon;
 		SingleWeight = ItemHealthRow->Weight;
 
 		InitPickup(EItemType::EIT_Health, ItemHealthRow->Name, "PICK UP ", ItemHealthRow->StaticMesh);

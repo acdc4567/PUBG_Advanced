@@ -6,6 +6,7 @@
 #include "Items/PickUpBase.h"
 #include "PUBGA_Enums.h"
 #include "Engine/DataTable.h"
+#include "PUBGA_Structs.h"
 #include "PickUpAmmo.generated.h"
 
 /**
@@ -26,6 +27,12 @@ public:
 
 	virtual int32 GetWeight() override;
 
+	FSTR_ItemAmmo* Datas = nullptr;
+
+	FSTR_ItemAmmo Datas1;
+
+	UFUNCTION(BlueprintPure)
+		FORCEINLINE FSTR_ItemAmmo GetDatas() const { return Datas1; }
 
 protected:
 

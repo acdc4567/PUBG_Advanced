@@ -2,7 +2,6 @@
 
 
 #include "Items/PickUpEquipment.h"
-#include "PUBGA_Structs.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 APickUpEquipment::APickUpEquipment() {
@@ -44,6 +43,10 @@ void APickUpEquipment::OnConstruction(const FTransform& Transform) {
 	ItemEquipmentRow = ItemEquipmentTableObject->FindRow<FSTR_ItemEquipment>(ID, TEXT(""));
 
 	if (ItemEquipmentRow) {
+		Datas = ItemEquipmentRow;
+		Datas1.Name = Datas->Name;
+		Datas1.Icon = Datas->Icon;
+
 		EquipmentType = ItemEquipmentRow->Type;
 
 		InitPickup(EquipmentType, ItemEquipmentRow->Name, "SWITCH TO ", ItemEquipmentRow->StaticMesh);

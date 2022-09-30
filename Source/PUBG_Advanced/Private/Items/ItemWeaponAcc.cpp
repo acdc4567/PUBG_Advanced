@@ -21,6 +21,8 @@ void AItemWeaponAcc::OnConstruction(const FTransform& Transform) {
 	
 	if (ItemWeaponAccRow) {
 		Datas = ItemWeaponAccRow;
+		Datas1.Name = Datas->Name;
+		Datas1.Icon = Datas->Icon;
 		Init(EItemType::EIT_Accessories,ItemWeaponAccRow->Name);
 		AccType = ItemWeaponAccRow->Type;
 

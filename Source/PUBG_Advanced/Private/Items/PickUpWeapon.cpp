@@ -2,7 +2,7 @@
 
 
 #include "Items/PickUpWeapon.h"
-#include "PUBGA_Structs.h"
+
 
 APickUpWeapon::APickUpWeapon() {
 
@@ -18,11 +18,20 @@ void APickUpWeapon::OnConstruction(const FTransform& Transform) {
 	ItemWeaponRow = ItemWeaponTableObject->FindRow<FSTR_ItemWeapon>(ID, TEXT(""));
 
 	if (ItemWeaponRow) {
+		Datas = ItemWeaponRow;
+		Datas1.Name = Datas->Name;
+		Datas1.Icon = Datas->Icon;
 		InitPickup(EItemType::EIT_Weapon,ItemWeaponRow->Name,"EQUIP ", ItemWeaponRow->StaticMesh);
 	}
 
 
 
 
+
+}
+
+
+FSTR_ItemWeapon APickUpWeapon::GetDatas() const {
+	 return Datas1; 
 
 }

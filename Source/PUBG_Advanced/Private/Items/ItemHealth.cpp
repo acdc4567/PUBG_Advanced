@@ -16,7 +16,8 @@ void AItemHealth::OnConstruction(const FTransform& Transform) {
 	ItemHealthRow = ItemHealthTableObject->FindRow<FSTR_ItemHealth>(ID, TEXT(""));
 	if (ItemHealthRow) {
 		Datas = ItemHealthRow;
-
+		Datas1.Name = Datas->Name;
+		Datas1.Icon = Datas->Icon;
 		Init(EItemType::EIT_Health, Datas->Name);
 		UseTime = Datas->UseTime;
 	

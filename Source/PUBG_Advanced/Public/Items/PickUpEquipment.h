@@ -6,6 +6,7 @@
 #include "Items/PickUpBase.h"
 #include "PUBGA_Enums.h"
 #include "Engine/DataTable.h"
+#include "PUBGA_Structs.h"
 #include "PickUpEquipment.generated.h"
 
 /**
@@ -22,6 +23,15 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Publics)
 		EItemType EquipmentType;
+
+	FSTR_ItemEquipment* Datas = nullptr;
+
+
+	FSTR_ItemEquipment Datas1;
+
+	UFUNCTION(BlueprintPure)
+		FORCEINLINE FSTR_ItemEquipment GetDatas() const { return Datas1; }
+
 
 protected:
 

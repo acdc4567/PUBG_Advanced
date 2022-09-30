@@ -22,8 +22,12 @@ public:
 
 	virtual int32 GetWeight() override;
 
+	FSTR_ItemAmmo* Datas = nullptr;
 
+	FSTR_ItemAmmo Datas1;
 
+	UFUNCTION(BlueprintPure)
+		FORCEINLINE FSTR_ItemAmmo GetDatas() const { return Datas1; }
 
 
 protected:
@@ -36,7 +40,7 @@ protected:
 
 	virtual void OnConstruction(const FTransform& Transform) override;
 
-	FSTR_ItemAmmo* Datas = nullptr;
+	
 
 	
 

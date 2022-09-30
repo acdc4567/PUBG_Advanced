@@ -246,10 +246,11 @@ bool APUBGA_PlayerState::CheckBackpackCapacity(int32 AddWeight) {
 
 		}
 	}
-
+	TotalCapacityOfBP = TotalCapacity;
 	for (AItemBase* Item : ItemsInBackpack) {
 		ItemsWeight += Item->GetWeight();
 	}
+	ItemsWeightTot = ItemsWeight;
 	if (AddWeight + ItemsWeight <= TotalCapacity) {
 		return 1;
 	}

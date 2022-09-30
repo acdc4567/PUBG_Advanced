@@ -45,6 +45,9 @@ void APickUpWeaponAcc::OnConstruction(const FTransform& Transform) {
 	
 	if (ItemWeaponAccRow) {
 		Datas = ItemWeaponAccRow;
+		Datas1.Name = Datas->Name;
+		Datas1.Icon = Datas->Icon;
+
 		InitPickup(EItemType::EIT_Accessories, ItemWeaponAccRow->Name, "PICK UP ", ItemWeaponAccRow->StaticMesh);
 		AccType = ItemWeaponAccRow->Type;
 

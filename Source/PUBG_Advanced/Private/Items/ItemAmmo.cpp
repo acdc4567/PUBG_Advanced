@@ -18,7 +18,8 @@ void AItemAmmo::OnConstruction(const FTransform& Transform) {
 	ItemAmmoRow = ItemAmmoTableObject->FindRow<FSTR_ItemAmmo>(ID, TEXT(""));
 	if (ItemAmmoRow) {
 		Datas = ItemAmmoRow;
-
+		Datas1.Name = Datas->Name;
+		Datas1.Icon = Datas->Icon;
 		Init(EItemType::EIT_Ammo, ItemAmmoRow->Name);
 
 

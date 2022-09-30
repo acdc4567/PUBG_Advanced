@@ -22,6 +22,14 @@ public:
 	AItemHealth();
 
 	virtual int32 GetWeight() override;
+
+	FSTR_ItemHealth* Datas = nullptr;
+
+	FSTR_ItemHealth Datas1;
+
+	UFUNCTION(BlueprintPure)
+		FORCEINLINE FSTR_ItemHealth GetDatas() const { return Datas1; }
+
 protected:
 	FString ItemHealthTablePath;
 
@@ -29,7 +37,7 @@ protected:
 
 	virtual void OnConstruction(const FTransform& Transform) override;
 
-	FSTR_ItemHealth* Datas = nullptr;
+	
 
 
 	

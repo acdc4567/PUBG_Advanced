@@ -14,4 +14,12 @@ class PUBG_ADVANCED_API APUBGA_HUD : public AHUD
 {
 	GENERATED_BODY()
 	
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Movement)
+		TSubclassOf<UUserWidget> PlayerHUDWidgetClass;
+
+	virtual void BeginPlay() override;
+
+
+
 };

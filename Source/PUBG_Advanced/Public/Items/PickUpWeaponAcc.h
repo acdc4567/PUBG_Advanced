@@ -27,6 +27,10 @@ public:
 	virtual int32 GetWeight() override;
 
 	FSTR_ItemWeaponAcc* Datas = nullptr;
+	FSTR_ItemWeaponAcc Datas1;
+
+	UFUNCTION(BlueprintPure)
+		FORCEINLINE FSTR_ItemWeaponAcc GetDatas() const { return Datas1; }
 
 protected:
 
