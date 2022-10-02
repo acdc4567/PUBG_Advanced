@@ -7,6 +7,8 @@
 #include "Items/PickUpBase.h"
 #include "Items/PickUpWeapon.h"
 #include "UI/I_GoodsItem_UserWidget.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/ScrollBox.h"
 
 
 void UI_Vicinity_UserWidget::UpdateList(bool bIsOnHand) {
@@ -91,11 +93,32 @@ void UI_Vicinity_UserWidget::UpdateList(bool bIsOnHand) {
 
 }
 
+void UI_Vicinity_UserWidget::NativePreConstruct() {
+	Super::NativePreConstruct();
+
+	PlayerControllerRef = Cast<APUBGA_PlayerController>(UGameplayStatics::GetPlayerController(this, 0));
+	if (PlayerControllerRef) {
+		
+		if (GoodsItemWidgetClass) {
+			UI_GoodsItem_UserWidget* GoodsWidget = CreateWidget<UI_GoodsItem_UserWidget>(GetWorld(), GoodsItemWidgetClass);
+			if (GoodsWidget) {
+				GoodsWidget->SetContents(nullptr,nullptr,"236",23);
+				GoodsItemList->AddChild(GoodsWidget);
+			}
+		}
+
+
+	}
+
+
+
+}
+
 bool UI_Vicinity_UserWidget::InitializePlayerController(APUBGA_PlayerController* APC) {
 	
 	if (APC) {
-		PlayerControllerRef = APC;
-		PlayerControllerRef->ItemsInRangeChangeSignature.AddDynamic(this, &UI_Vicinity_UserWidget::UpdateList);
+		//PlayerControllerRef = APC;
+		//PlayerControllerRef->ItemsInRangeChangeSignature.AddDynamic(this, &UI_Vicinity_UserWidget::UpdateList);
 		return 1;
 	}
 	else {

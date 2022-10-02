@@ -18,11 +18,13 @@ class PUBG_ADVANCED_API UI_GoodsItem_UserWidget : public UUserWidget
 	
 public:
 	
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	UFUNCTION()
 		void SetContentx(AItemBase* ItemBase,UTexture2D* Icon,FName Name,int32 Amount);
 
 	
-	
+	UFUNCTION(BlueprintImplementableEvent)
+		void SetContents(AItemBase* ItemBase, UTexture2D* Icon, FName Name, int32 Amount);
+
 
 
 };

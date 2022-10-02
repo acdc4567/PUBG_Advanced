@@ -139,7 +139,7 @@ void APUBGA_PlayerController::SetupInputComponent() {
 
 	InputComponent->BindAction("ShowInventory1", IE_Pressed, this, &APUBGA_PlayerController::Inventory1KeyPressed);
 	
-	//InputComponent->BindAction("Inventory1", IE_Pressed, this, &APUBGA_PlayerController::Inventory1KeyPressed);
+	InputComponent->BindAction("Inventory1", IE_Pressed, this, &APUBGA_PlayerController::Inventory2KeyPressed);
 
 }
 
@@ -2310,6 +2310,31 @@ void APUBGA_PlayerController::Inventory1KeyPressed() {
 		}
 
 	}
+
+
+
+}
+
+void APUBGA_PlayerController::Inventory2KeyPressed() {
+	if (VicinityUI) {
+
+		VicinityUI->RemoveFromParent();
+		VicinityUI = nullptr;
+		SetupInputModeGameOnly();
+		SetShowMouseCursor(0);
+	}
+	else {
+		UI_Vicinity_UserWidget* PlayerVicWidget = CreateWidget<UI_Vicinity_UserWidget>(GetWorld(), PlayerVicinityWidgetClass);
+
+		if (PlayerVicWidget) {
+			VicinityUI = PlayerVicWidget;
+			PlayerVicWidget->AddToViewport();
+			SetupInputModeGameAndUI();
+			SetShowMouseCursor(1);
+		}
+	}
+	
+
 
 
 

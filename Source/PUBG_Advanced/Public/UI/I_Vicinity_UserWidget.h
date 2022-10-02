@@ -42,9 +42,10 @@ protected:
 		void AddChildrens(AItemBase* ItemBase, UTexture2D* Icon, FName Name, int32 Amount);
 
 
+	virtual void NativePreConstruct() override;
 
-
-
+	UPROPERTY(meta = (BindWidget))
+		class UScrollBox* GoodsItemList;
 
 
 public:

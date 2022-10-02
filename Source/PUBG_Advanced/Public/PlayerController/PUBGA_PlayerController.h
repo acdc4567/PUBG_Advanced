@@ -296,7 +296,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = GameMode)
 		AItemWeapon* ReadyEquipWeapon;
 
-	bool PickupGoods(APickUpBase* PUItem);
+	UFUNCTION(BlueprintCallable)
+		bool PickupGoods(APickUpBase* PUItem);
 
 	UFUNCTION(BlueprintCallable)
 		void DiscardItem(AItemBase* IBItem);
@@ -359,6 +360,8 @@ protected:
 
 	void InventoryKeyPressed();
 	void Inventory1KeyPressed();
+
+	void Inventory2KeyPressed();
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void SetupInputModeGameAndUI();
