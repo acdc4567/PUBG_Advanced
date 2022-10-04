@@ -166,3 +166,18 @@ void UI_Equipment_UWidget::UpdateShow() {
 
 
 }
+
+void UI_Equipment_UWidget::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) {
+	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
+	
+	
+	Bg->SetColorAndOpacity(FLinearColor(.01f, .01f, .01f, .6f));
+}
+
+void UI_Equipment_UWidget::NativeOnMouseLeave(const FPointerEvent& InMouseEvent) {
+	Super::NativeOnMouseLeave(InMouseEvent);
+
+	Bg->SetColorAndOpacity(FLinearColor(0.f, 0.f, 0.f, .6f));
+
+
+}
