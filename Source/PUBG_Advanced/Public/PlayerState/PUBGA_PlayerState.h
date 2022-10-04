@@ -179,7 +179,7 @@ public:
 
 	void UpdateAmmoObject();
 
-	void UpdateAmmoAmount(FName IDx,bool bAdd,int32 Amountx);
+	void UpdateAmmoAmount(FName IDx,bool bAdd,int32 Amountx,bool bFromGround=0);
 
 	bool CheckReplaceBackpack(AItemBase* Item);
 

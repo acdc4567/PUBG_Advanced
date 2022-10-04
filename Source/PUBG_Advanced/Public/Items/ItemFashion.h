@@ -28,6 +28,8 @@ public:
 	UFUNCTION(BlueprintPure)
 		FORCEINLINE FSTR_ItemFashion GetDatas() const { return Datas1; }
 
+	FSTR_ItemFashion* Datas = nullptr;
+
 protected:
 	FString ItemFashionTablePath;
 
@@ -35,7 +37,7 @@ protected:
 
 	virtual void OnConstruction(const FTransform& Transform) override;
 
-	FSTR_ItemFashion* Datas = nullptr;
+	
 
 	
 

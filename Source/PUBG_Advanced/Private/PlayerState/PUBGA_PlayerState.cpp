@@ -341,9 +341,9 @@ void APUBGA_PlayerState::UpdateAmmoObject() {
 	}
 }
 
-void APUBGA_PlayerState::UpdateAmmoAmount(FName IDx, bool bAdd, int32 Amountx) {
+void APUBGA_PlayerState::UpdateAmmoAmount(FName IDx, bool bAdd, int32 Amountx, bool bFromGround) {
 	
-	if (Amountx == 0 && bAdd) {
+	if (Amountx == 0 && (bAdd || bFromGround)) {
 		if (IDx == "1") {
 			SetAmmo556(0);
 		}

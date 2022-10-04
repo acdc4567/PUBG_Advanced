@@ -20,6 +20,7 @@ class PUBG_ADVANCED_API AItemEquipment : public AItemBase
 public:
 	AItemEquipment();
 
+	FSTR_ItemEquipment* Datas = nullptr;
 
 protected:
 
@@ -29,7 +30,7 @@ protected:
 
 	virtual void OnConstruction(const FTransform& Transform) override;
 
-	FSTR_ItemEquipment* Datas = nullptr;
+	
 
 	FSTR_ItemEquipment Datas1;
 

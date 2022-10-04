@@ -123,7 +123,7 @@ public:
 	
 	//Setters
 
-	FORCEINLINE void SetIsIsProne(bool bValue) { bIsProne = bValue; }
+	FORCEINLINE void SetIsProne(bool bValue) { bIsProne = bValue; }
 	FORCEINLINE void SetIsCrouching(bool bValue) { bIsCrouching = bValue; }
 	FORCEINLINE void SetIsAiming(bool bValue) { bIsAiming = bValue; }
 	FORCEINLINE void SetIsPlayingMontage(bool bValue) { bIsPlayingMontage = bValue; }

@@ -5,6 +5,7 @@
 #include "Player/PUBGA_Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "KismetAnimationLibrary.h"
 
 
 
@@ -39,7 +40,7 @@ void UPUBGA_AnimInstance::UpdateAnimationProperties(float DeltaTime) {
 		Speed = Velocity.Size();
 		const FRotator ShooterRotation= ShooterCharacter->GetActorRotation();
 		const FQuat ShooterRotationQuat = ShooterCharacter->GetActorQuat();
-		Direction = CalculateDirection(Velocity,ShooterRotation);
+		Direction = UKismetAnimationLibrary::CalculateDirection(Velocity,ShooterRotation);
 		const FRotator ShooterControlRot = ShooterCharacter->GetControlRotation();
 		Pitch = UKismetMathLibrary::NormalizedDeltaRotator(ShooterControlRot, ShooterRotation).Pitch;
 		Yaw = UKismetMathLibrary::NormalizedDeltaRotator(ShooterControlRot, ShooterRotation).Yaw;

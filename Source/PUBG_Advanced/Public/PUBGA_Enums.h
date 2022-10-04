@@ -69,6 +69,18 @@ enum class EShootMode : uint8 {
 };
 
 
+UENUM(BlueprintType)
+enum class EInventoryLocationx : uint8 {
+	EIL_None UMETA(DisplayName = "None"),
+	EIL_Helmet UMETA(DisplayName = "Helmet"),
+	EIL_Vest UMETA(DisplayName = "Vest"),
+	EIL_Backpack UMETA(DisplayName = "Backpack"),
+	EIL_ClothesTop UMETA(DisplayName = "ClothesTop"),
+	EIL_ClothesBottom UMETA(DisplayName = "ClothesBottom"),
+	EIL_Shoes UMETA(DisplayName = "Shoes"),
+
+	EIL_MAX UMETA(DisplayName = "DefaultMAX")
+};
 
 
 

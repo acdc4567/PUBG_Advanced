@@ -17,6 +17,7 @@ class APickUpWeapon;
 class AItemWeapon;
 class UInventory_UserWidget;
 class UI_Vicinity_UserWidget;
+class UInventory_User_Widget;
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemsInRangeChangeSignature, bool, bIsOnHand);
@@ -368,6 +369,18 @@ protected:
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void SetupInputModeGameOnly();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = UserInterfaces)
+		UInventory_User_Widget* NewInventoryUI;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = UserInterfaces)
+		TSubclassOf<UInventory_User_Widget> NewInventoryWidgetClass;
+
+	void Inventory3KeyPressed();
+
+
+
+
 
 
 

@@ -29,6 +29,7 @@
 #include "Blueprint/UserWidget.h"
 #include "UI/Inventory_UserWidget.h"
 #include "UI/I_Vicinity_UserWidget.h"
+#include "UI/Inventory_User_Widget.h"
 
 
 
@@ -137,7 +138,7 @@ void APUBGA_PlayerController::SetupInputComponent() {
 
 	InputComponent->BindAction("Reload", IE_Pressed, this, &APUBGA_PlayerController::ReloadKeyPressed);
 
-	InputComponent->BindAction("ShowInventory1", IE_Pressed, this, &APUBGA_PlayerController::Inventory1KeyPressed);
+	InputComponent->BindAction("ShowInventory1", IE_Pressed, this, &APUBGA_PlayerController::Inventory3KeyPressed);
 	
 	InputComponent->BindAction("Inventory1", IE_Pressed, this, &APUBGA_PlayerController::Inventory2KeyPressed);
 
@@ -379,7 +380,7 @@ void APUBGA_PlayerController::ProneKeyPressed() {
 void APUBGA_PlayerController::AimKeyPressed() {
 	if (!MyCharacterRef)return;
 	if (!PlayerStateRef)return;
-	if (InventoryUI)return;
+	if (NewInventoryUI)return;
 	if (!(MyCharacterRef->GetIsProne() && (MoveForwardAxis != 0 || MoveRightAxis != 0)) && !MyCharacterRef->GetIsSightAiming()&&(!MyCharacterRef->GetIsPlayingMontage()||MyCharacterRef->GetPlayingMontageType()==EMontageType::EMT_Fire)) {
 		RightPressedTime = GetWorld()->GetTimeSeconds();
 		if (PlayerStateRef->GetHoldGun()) {
@@ -2167,7 +2168,7 @@ void APUBGA_PlayerController::ShootModeKeyPressed() {
 void APUBGA_PlayerController::FireKeyPressed() {
 	if (!PlayerStateRef)return;
 	if (!MyCharacterRef)return;
-	if (InventoryUI)return;
+	if (NewInventoryUI)return;
 	if (PlayerStateRef->GetHoldGun() && !(MyCharacterRef->GetCharacterMovement()->Velocity.Size() != 0.f && MyCharacterRef->GetIsProne()) && bEnableMove && !bAltPressed && !MyCharacterRef->GetCharacterMovement()->IsFalling()) {
 		if (!PlayerStateRef->GetHoldGun()->bNeedReloadBullet) {
 			if (!MyCharacterRef->GetIsPlayingMontage() || MyCharacterRef->GetPlayingMontageType() == EMontageType::EMT_Fire) {
@@ -2336,6 +2337,38 @@ void APUBGA_PlayerController::Inventory2KeyPressed() {
 	
 
 
+
+
+}
+
+void APUBGA_PlayerController::Inventory3KeyPressed() {
+
+	if (NewInventoryUI) {
+
+		NewInventoryUI->RemoveFromParent();
+		NewInventoryUI = nullptr;
+		SetupInputModeGameOnly();
+		SetShowMouseCursor(0);
+	}
+	else {
+		UInventory_User_Widget* PlayerInventoryWidget = CreateWidget<UInventory_User_Widget>(GetWorld(), NewInventoryWidgetClass);
+		if (PlayerInventoryWidget) {
+			if (PlayerInventoryWidget->InitializePlayerController(this)) {
+				if (PlayerInventoryWidget->InitializePlayerState(PlayerStateRef)) {
+					NewInventoryUI = PlayerInventoryWidget;
+					NewInventoryUI->AddToViewport();
+
+					SetupInputModeGameAndUI();
+					SetShowMouseCursor(1);
+					ReverseHoldAiming();
+				}
+
+			}
+
+
+		}
+
+	}
 
 
 }
