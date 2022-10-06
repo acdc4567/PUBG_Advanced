@@ -13,6 +13,7 @@
 #include "Items/ItemFashion.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "PUBGA_Structs.h"
+#include "Player/PUBGA_Character.h"
 
 
 
@@ -50,19 +51,48 @@ ACapture_Actor_Cpp::ACapture_Actor_Cpp() {
 
 }
 
+void ACapture_Actor_Cpp::Tick(float DeltaTime) {
+	Super::Tick(DeltaTime);
+
+	
+	if (PlayerStateRef->GetHoldGun()) {
+		bHoldWeapon = 1;
+	}
+	else {
+		bHoldWeapon = 0;
+	}
+	
+	if (bHoldWeapon) {
+		
+		
+		PlayHoldGunAnim();
+	}
+	else {
+		PlayNoGunAnim();
+	}
+
+
+}
+
 void ACapture_Actor_Cpp::BeginPlay() {
 	Super::BeginPlay();
 
 	PlayerControllerRef = Cast<APUBGA_PlayerController>(UGameplayStatics::GetPlayerController(this, 0));
-
+	PlayerCharacterRef=Cast<APUBGA_Character>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	
 	if (PlayerControllerRef) {
 		PlayerStateRef = PlayerControllerRef->GetPlayerStateRef();
 		if (PlayerStateRef) {
 			PlayerStateRef->OnEquipmentChanged.AddDynamic(this, &ACapture_Actor_Cpp::UpdateEquipment);
 			PlayerStateRef->OnFashionChanged.AddDynamic(this, &ACapture_Actor_Cpp::UpdateFashionx);
+			PlayerStateRef->OnWeaponChanged.AddDynamic(this, &ACapture_Actor_Cpp::UpdateWeaponx);
+			PlayerStateRef->OnWeaponAccChanged.AddDynamic(this, &ACapture_Actor_Cpp::UpdateWeaponAcc);
+
 			UpdateFashionx(nullptr,0);
 			UpdateEquipment(nullptr,0);
-			//InitSkeletalMesh();
+			UpdateWeaponx(nullptr,EWeaponPosition::EWP_Left,0	);
+			
+			
 		}
 	}
 
@@ -74,6 +104,7 @@ void ACapture_Actor_Cpp::Destroyed() {
 	Super::Destroyed();
 
 	PlayerControllerRef = Cast<APUBGA_PlayerController>(UGameplayStatics::GetPlayerController(this, 0));
+	PlayerCharacterRef = Cast<APUBGA_Character>(UGameplayStatics::GetPlayerCharacter(this, 0));
 
 	if (PlayerControllerRef) {
 		PlayerStateRef = PlayerControllerRef->GetPlayerStateRef();
@@ -81,7 +112,10 @@ void ACapture_Actor_Cpp::Destroyed() {
 			PlayerStateRef->OnEquipmentChanged.RemoveDynamic(this, &ACapture_Actor_Cpp::UpdateEquipment);
 			ClearEquipments();
 			PlayerStateRef->OnFashionChanged.RemoveDynamic(this, &ACapture_Actor_Cpp::UpdateFashionx);
-
+			PlayerStateRef->OnWeaponChanged.RemoveDynamic(this, &ACapture_Actor_Cpp::UpdateWeaponx);
+			ClearWeapons();
+			PlayerStateRef->OnWeaponAccChanged.RemoveDynamic(this, &ACapture_Actor_Cpp::UpdateWeaponAcc);
+			
 		}
 	}
 
@@ -439,6 +473,120 @@ void ACapture_Actor_Cpp::UpdateFashionx(AItemBase* Fashion, bool bIsAdd) {
 
 
 
+}
+
+void ACapture_Actor_Cpp::UpdateWeaponx(AItemWeapon* Weapon, EWeaponPosition Position, bool bIsOnHand) {
+
+	UpdateWeapon();
+
+}
+
+void ACapture_Actor_Cpp::UpdateWeapon() {
+
+	if (!PlayerStateRef)return;
+	if (!PlayerControllerRef)return;
+	ClearWeapons();
+	if (PlayerStateRef->GetHoldGun()) {
+		HoldWeapon= SpawnActorx(EItemType::EIT_Weapon, PlayerStateRef->GetHoldGun()->ID,"3DCharacterWeaponHand");
+		if (HoldWeapon) {
+			Attach(HoldWeapon, PlayerControllerRef->GunStandName);
+			UpdateAccessories(PlayerStateRef->GetHoldGun(),HoldWeapon);
+		}
+		
+
+	}
+	
+	
+
+
+	bool bIsEquipBackpack = 0;
+	TArray<AItemBase*> Equipments = PlayerStateRef->GetEquipments();
+	if (!Equipments.IsEmpty()) {
+		for (AItemBase* Equipment : Equipments) {
+			if (Equipment->ItemType == EItemType::EIT_Backpack) {
+				bIsEquipBackpack = 1;
+
+			}
+		}
+
+	}
+	if (PlayerStateRef->GetWeapon1()) {
+		LeftWeapon = SpawnActorx(EItemType::EIT_Weapon, PlayerStateRef->GetWeapon1()->ID, "3DCharacterWeapon_1");
+		if (LeftWeapon) {
+			UpdateAccessories(PlayerStateRef->GetWeapon1(), LeftWeapon);
+			if (bIsEquipBackpack) {
+				Attach(LeftWeapon, PlayerControllerRef->BackLeftBName);
+			}
+			else {
+				Attach(LeftWeapon, PlayerControllerRef->BackLeftNName);
+			}
+		}
+		
+
+	}
+	if (PlayerStateRef->GetWeapon2()) {
+		RightWeapon= SpawnActorx(EItemType::EIT_Weapon, PlayerStateRef->GetWeapon2()->ID, "3DCharacterWeapon_2");
+		if (RightWeapon) {
+			UpdateAccessories(PlayerStateRef->GetWeapon2(), RightWeapon);
+
+			if (bIsEquipBackpack) {
+				Attach(RightWeapon, PlayerControllerRef->BackRightBName);
+			}
+			else {
+				Attach(RightWeapon, PlayerControllerRef->BackRightNName);
+			}
+		}
+		
+
+	}
+
+
+}
+
+void ACapture_Actor_Cpp::ClearWeapons() {
+
+	if (HoldWeapon) {
+		HoldWeapon->Destroy();
+		HoldWeapon = nullptr;
+	}
+	if (LeftWeapon) {
+		LeftWeapon->Destroy();
+		LeftWeapon = nullptr;
+	}
+	if (RightWeapon) {
+		RightWeapon->Destroy();
+		RightWeapon = nullptr;
+	}
+
+}
+
+void ACapture_Actor_Cpp::UpdateAccessories(AItemBase* CharacterWeapon, AItemBase* d3DWeapon) {
+	if (CharacterWeapon&& d3DWeapon) {
+		AItemWeapon* d3DWeaponCastToIW = Cast<AItemWeapon>(d3DWeapon);
+		AItemWeapon* CharWeaponCastToIW = Cast<AItemWeapon>(CharacterWeapon);
+
+		if (d3DWeaponCastToIW && CharWeaponCastToIW) {
+			d3DWeaponCastToIW->UpdateSight(CharWeaponCastToIW->AccSightObj);
+			d3DWeaponCastToIW->UpdateButtstock(CharWeaponCastToIW->AccButtstockObj);
+			d3DWeaponCastToIW->UpdateMuzzle(CharWeaponCastToIW->AccMuzzleObj);
+			d3DWeaponCastToIW->UpdateMag(CharWeaponCastToIW->AccMagObj);
+			d3DWeaponCastToIW->UpdateForegrip(CharWeaponCastToIW->AccForegripObj);
+		}
+
+	}
+
+	
+
+
+}
+
+void ACapture_Actor_Cpp::UpdateWeaponAcc(AItemWeapon* Weapon, bool bIsRemove, AItemWeaponAcc* AccObj, EWeaponAccType AccType) {
+
+	if (!PlayerStateRef)return;
+	
+	UpdateAccessories(PlayerStateRef->GetHoldGun(),HoldWeapon);
+	UpdateAccessories(PlayerStateRef->GetWeapon1(), LeftWeapon);
+	UpdateAccessories(PlayerStateRef->GetWeapon2(), RightWeapon);
 }
 
 

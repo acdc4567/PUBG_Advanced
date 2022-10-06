@@ -102,7 +102,7 @@ void UI_Vicinity_UserWidget::NativePreConstruct() {
 		if (GoodsItemWidgetClass) {
 			UI_GoodsItem_UserWidget* GoodsWidget = CreateWidget<UI_GoodsItem_UserWidget>(GetWorld(), GoodsItemWidgetClass);
 			if (GoodsWidget) {
-				GoodsWidget->SetContents(nullptr,nullptr,"236",23);
+				//GoodsWidget->SetContents(nullptr,nullptr,"236",23);
 				GoodsItemList->AddChild(GoodsWidget);
 			}
 		}

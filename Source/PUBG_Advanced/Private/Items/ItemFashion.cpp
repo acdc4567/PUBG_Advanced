@@ -13,7 +13,10 @@ AItemFashion::AItemFashion() {
 
 void AItemFashion::OnConstruction(const FTransform& Transform) {
 	FSTR_ItemFashion* ItemFashionRow = nullptr;
-	ItemFashionRow = ItemFashionTableObject->FindRow<FSTR_ItemFashion>(ID, TEXT(""));
+	if (ID != " " || ID != "") {
+		ItemFashionRow = ItemFashionTableObject->FindRow<FSTR_ItemFashion>(ID, TEXT(""));
+
+	}
 	if (ItemFashionRow) {
 		Datas = ItemFashionRow;
 		Datas1.Icon = Datas->Icon;

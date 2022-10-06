@@ -15,6 +15,7 @@
 #include "Items/PickUpEquipment.h"
 #include "Items/PickUpFashion.h"
 #include "Items/PickUpHealth.h"
+#include "UI/I_DragDropOperation.h"
 
 
 
@@ -57,7 +58,7 @@ void UI_Vicinity_UWidget::UpdateList(bool bIsOnHand) {
 				PUItemCastToIB = Cast<AItemBase>(ItemInRange);
 				GoodsWidget = CreateWidget<UI_GoodsItem_UserWidget>(GetWorld(), GoodsItemWidgetClass);
 				if (GoodsWidget && PUItemCastToIB) {
-					GoodsWidget->SetContents(PUItemCastToIB, Icon, Name, Amount);
+					GoodsWidget->SetContents(PUItemCastToIB, Icon, Name, Amount,EInventoryLocationx::EIL_VicinityList);
 					GoodsItemList->AddChild(GoodsWidget);
 				}
 
@@ -75,7 +76,7 @@ void UI_Vicinity_UWidget::UpdateList(bool bIsOnHand) {
 				PUItemCastToIB = Cast<AItemBase>(ItemInRange);
 				GoodsWidget = CreateWidget<UI_GoodsItem_UserWidget>(GetWorld(), GoodsItemWidgetClass);
 				if (GoodsWidget && PUItemCastToIB) {
-					GoodsWidget->SetContents(PUItemCastToIB, Icon, Name, Amount);
+					GoodsWidget->SetContents(PUItemCastToIB, Icon, Name, Amount, EInventoryLocationx::EIL_VicinityList);
 					GoodsItemList->AddChild(GoodsWidget);
 				}
 
@@ -93,7 +94,7 @@ void UI_Vicinity_UWidget::UpdateList(bool bIsOnHand) {
 				PUItemCastToIB = Cast<AItemBase>(ItemInRange);
 				GoodsWidget = CreateWidget<UI_GoodsItem_UserWidget>(GetWorld(), GoodsItemWidgetClass);
 				if (GoodsWidget && PUItemCastToIB) {
-					GoodsWidget->SetContents(PUItemCastToIB, Icon, Name, Amount);
+					GoodsWidget->SetContents(PUItemCastToIB, Icon, Name, Amount, EInventoryLocationx::EIL_VicinityList);
 					GoodsItemList->AddChild(GoodsWidget);
 				}
 
@@ -111,7 +112,7 @@ void UI_Vicinity_UWidget::UpdateList(bool bIsOnHand) {
 				PUItemCastToIB = Cast<AItemBase>(ItemInRange);
 				GoodsWidget = CreateWidget<UI_GoodsItem_UserWidget>(GetWorld(), GoodsItemWidgetClass);
 				if (GoodsWidget && PUItemCastToIB) {
-					GoodsWidget->SetContents(PUItemCastToIB, Icon, Name, Amount);
+					GoodsWidget->SetContents(PUItemCastToIB, Icon, Name, Amount, EInventoryLocationx::EIL_VicinityList);
 					GoodsItemList->AddChild(GoodsWidget);
 				}
 
@@ -129,7 +130,7 @@ void UI_Vicinity_UWidget::UpdateList(bool bIsOnHand) {
 				PUItemCastToIB = Cast<AItemBase>(ItemInRange);
 				GoodsWidget = CreateWidget<UI_GoodsItem_UserWidget>(GetWorld(), GoodsItemWidgetClass);
 				if (GoodsWidget && PUItemCastToIB) {
-					GoodsWidget->SetContents(PUItemCastToIB, Icon, Name, Amount);
+					GoodsWidget->SetContents(PUItemCastToIB, Icon, Name, Amount, EInventoryLocationx::EIL_VicinityList);
 					GoodsItemList->AddChild(GoodsWidget);
 				}
 
@@ -147,7 +148,7 @@ void UI_Vicinity_UWidget::UpdateList(bool bIsOnHand) {
 				PUItemCastToIB = Cast<AItemBase>(ItemInRange);
 				GoodsWidget = CreateWidget<UI_GoodsItem_UserWidget>(GetWorld(), GoodsItemWidgetClass);
 				if (GoodsWidget && PUItemCastToIB) {
-					GoodsWidget->SetContents(PUItemCastToIB, Icon, Name, Amount);
+					GoodsWidget->SetContents(PUItemCastToIB, Icon, Name, Amount, EInventoryLocationx::EIL_VicinityList);
 					GoodsItemList->AddChild(GoodsWidget);
 				}
 
@@ -165,7 +166,7 @@ void UI_Vicinity_UWidget::UpdateList(bool bIsOnHand) {
 				PUItemCastToIB = Cast<AItemBase>(ItemInRange);
 				GoodsWidget = CreateWidget<UI_GoodsItem_UserWidget>(GetWorld(), GoodsItemWidgetClass);
 				if (GoodsWidget && PUItemCastToIB) {
-					GoodsWidget->SetContents(PUItemCastToIB, Icon, Name, Amount);
+					GoodsWidget->SetContents(PUItemCastToIB, Icon, Name, Amount, EInventoryLocationx::EIL_VicinityList);
 					GoodsItemList->AddChild(GoodsWidget);
 				}
 
@@ -183,7 +184,7 @@ void UI_Vicinity_UWidget::UpdateList(bool bIsOnHand) {
 				PUItemCastToIB = Cast<AItemBase>(ItemInRange);
 				GoodsWidget = CreateWidget<UI_GoodsItem_UserWidget>(GetWorld(), GoodsItemWidgetClass);
 				if (GoodsWidget && PUItemCastToIB) {
-					GoodsWidget->SetContents(PUItemCastToIB, Icon, Name, Amount);
+					GoodsWidget->SetContents(PUItemCastToIB, Icon, Name, Amount, EInventoryLocationx::EIL_VicinityList);
 					GoodsItemList->AddChild(GoodsWidget);
 				}
 
@@ -201,7 +202,7 @@ void UI_Vicinity_UWidget::UpdateList(bool bIsOnHand) {
 				PUItemCastToIB = Cast<AItemBase>(ItemInRange);
 				GoodsWidget = CreateWidget<UI_GoodsItem_UserWidget>(GetWorld(), GoodsItemWidgetClass);
 				if (GoodsWidget && PUItemCastToIB) {
-					GoodsWidget->SetContents(PUItemCastToIB, Icon, Name, Amount);
+					GoodsWidget->SetContents(PUItemCastToIB, Icon, Name, Amount, EInventoryLocationx::EIL_VicinityList);
 					GoodsItemList->AddChild(GoodsWidget);
 				}
 
@@ -250,3 +251,62 @@ void UI_Vicinity_UWidget::NativeDestruct() {
 
 
 }
+
+bool UI_Vicinity_UWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) {
+	bool bSuper = Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
+	if (!PlayerControllerRef)return 0;
+	UI_DragDropOperation* DragDropOp = Cast<UI_DragDropOperation>(InOperation);
+	if (DragDropOp) {
+		
+
+		switch (DragDropOp->Locationx) {
+		case EInventoryLocationx::EIL_None:
+
+
+			break;
+		case EInventoryLocationx::EIL_Helmet:
+			break;
+		case EInventoryLocationx::EIL_Vest:
+			break;
+		case EInventoryLocationx::EIL_Backpack:
+			break;
+		case EInventoryLocationx::EIL_ClothesTop:
+			break;
+		case EInventoryLocationx::EIL_ClothesBottom:
+			break;
+		case EInventoryLocationx::EIL_Shoes:
+			break;
+		case EInventoryLocationx::EIL_VicinityList:
+			
+
+
+
+
+			break;
+		case EInventoryLocationx::EIL_BackpackList:
+			PlayerControllerRef->DiscardItem(DragDropOp->DraggedItem);
+
+			return 1||bSuper;
+
+
+
+			break;
+		case EInventoryLocationx::EIL_Weapon:
+			break;
+		case EInventoryLocationx::EIL_WeaponAcc:
+			break;
+		case EInventoryLocationx::EIL_MAX:
+			break;
+		default:
+			break;
+		}
+
+
+
+	}
+	return bSuper;
+}
+
+
+
+

@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "PUBGA_Enums.h"
+
 #include "I_GoodsItem_UserWidget.generated.h"
 
 
@@ -23,7 +25,10 @@ public:
 
 	
 	UFUNCTION(BlueprintImplementableEvent)
-		void SetContents(AItemBase* ItemBase, UTexture2D* Icon, FName Name, int32 Amount);
+		void SetContents(AItemBase* ItemBase, UTexture2D* Icon, FName Name, int32 Amount, EInventoryLocationx Locationx1);
+
+
+	
 
 
 

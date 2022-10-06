@@ -23,6 +23,7 @@ class ABulletProjectile;
 
 
 
+
 UCLASS()
 class PUBG_ADVANCED_API APUBGA_Character : public ACharacter
 {
@@ -193,6 +194,7 @@ protected:
 	
 
 
+
 private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = CharacterPose, meta = (AllowPrivateAccess = "true"))
@@ -261,7 +263,7 @@ public:
 	FORCEINLINE void SetIsSightAiming(bool bValue) { bIsSightAiming = bValue; }
 	FORCEINLINE void SetIsAccurateAiming(bool bValue) { bIsAimAccurate = bValue; }
 
-
+	
 
 	virtual void PossessedBy(AController* inController) override;
 

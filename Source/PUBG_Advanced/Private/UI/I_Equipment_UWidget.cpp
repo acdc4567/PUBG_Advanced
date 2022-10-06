@@ -9,6 +9,8 @@
 #include "Items/ItemBase.h"
 #include "Items/ItemFashion.h"
 #include "Items/ItemEquipment.h"
+#include "UI/I_DragDropOperation.h"
+#include "Items/PickUpBase.h"
 
 
 void UI_Equipment_UWidget::NativeConstruct() {
@@ -181,3 +183,112 @@ void UI_Equipment_UWidget::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 
 
 }
+
+
+bool UI_Equipment_UWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) {
+	bool bSuper=Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
+	if (!PlayerControllerRef)return 0;
+	UI_DragDropOperation* DragDropOp = Cast<UI_DragDropOperation>(InOperation);
+
+	if (DragDropOp) {
+		APickUpBase* DraggedItemCastToPUB = nullptr;
+
+		switch (DragDropOp->Locationx) {
+		case EInventoryLocationx::EIL_None:
+
+
+			break;
+		case EInventoryLocationx::EIL_Helmet:
+			break;
+		case EInventoryLocationx::EIL_Vest:
+			break;
+		case EInventoryLocationx::EIL_Backpack:
+			break;
+		case EInventoryLocationx::EIL_ClothesTop:
+			break;
+		case EInventoryLocationx::EIL_ClothesBottom:
+			break;
+		case EInventoryLocationx::EIL_Shoes:
+			break;
+		case EInventoryLocationx::EIL_VicinityList:
+			switch (DragDropOp->DraggedItem->ItemType) {
+			case EItemType::EIT_Weapon:
+				break;
+			case EItemType::EIT_Accessories:
+				break;
+			case EItemType::EIT_Ammo:
+				break;
+			case EItemType::EIT_Health:
+				break;
+			case EItemType::EIT_Boost:
+				break;
+			case EItemType::EIT_Helmet:
+				if (PlayerControllerRef->PickupEquipment(DragDropOp->DraggedItem)) {
+					DragDropOp->DraggedItem->Destroy();
+					return 1||bSuper;
+				}
+
+				break;
+			case EItemType::EIT_Vest:
+				if (PlayerControllerRef->PickupEquipment(DragDropOp->DraggedItem)) {
+					DragDropOp->DraggedItem->Destroy();
+					return 1 || bSuper;
+				}
+
+				break;
+			case EItemType::EIT_Backpack:
+				if (PlayerControllerRef->PickupEquipment(DragDropOp->DraggedItem)) {
+					DragDropOp->DraggedItem->Destroy();
+					return 1 || bSuper;
+				}
+
+				break;
+			case EItemType::EIT_Fashion:
+
+				DraggedItemCastToPUB = Cast<APickUpBase>(DragDropOp->DraggedItem);
+				if (DraggedItemCastToPUB) {
+					UE_LOG(LogTemp, Warning, TEXT("GG"));
+					PlayerControllerRef->PickupFashion(DraggedItemCastToPUB);
+					DragDropOp->DraggedItem->Destroy();
+					return 1 || bSuper;
+				}
+				
+				break;
+			case EItemType::EIT_MAX:
+				break;
+			default:
+				break;
+			}
+
+
+
+
+
+			break;
+		case EInventoryLocationx::EIL_BackpackList:
+			break;
+		case EInventoryLocationx::EIL_Weapon:
+			break;
+		case EInventoryLocationx::EIL_WeaponAcc:
+			break;
+		case EInventoryLocationx::EIL_MAX:
+			break;
+		default:
+			break;
+		}
+
+
+
+	}
+	return bSuper;
+}
+
+
+
+
+
+
+
+
+
+

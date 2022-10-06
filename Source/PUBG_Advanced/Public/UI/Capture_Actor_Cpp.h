@@ -14,6 +14,7 @@ class USkeletalMeshComponent;
 class APUBGA_PlayerController;
 class APUBGA_PlayerState;
 class AItemBase;
+class APUBGA_Character;
 
 
 
@@ -28,6 +29,17 @@ class PUBG_ADVANCED_API ACapture_Actor_Cpp : public ASceneCapture2D
 public:
 	ACapture_Actor_Cpp();
 
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Meshes)
+		bool bHoldWeapon = 0;
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void PlayHoldGunAnim();
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void PlayNoGunAnim();
 
 protected:
 	
@@ -99,6 +111,41 @@ protected:
 
 	UFUNCTION()
 		void UpdateFashionx(AItemBase* Fashion, bool bIsAdd);
+
+	UFUNCTION()
+		void UpdateWeaponx(AItemWeapon* Weapon, EWeaponPosition Position, bool bIsOnHand);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Meshes)
+		UAnimSequence* HoldWeaponStance;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Meshes)
+		UAnimSequence* NoWeaponStance;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Meshes)
+		APUBGA_Character* PlayerCharacterRef;
+
+	
+
+	
+
+	void UpdateWeapon();
+
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Meshes)
+		AItemBase* HoldWeapon;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Meshes)
+		AItemBase* LeftWeapon;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Meshes)
+		AItemBase* RightWeapon;
+
+	void ClearWeapons();
+
+	void UpdateAccessories(AItemBase* CharacterWeapon,AItemBase* d3DWeapon);
+
+	UFUNCTION()
+		void UpdateWeaponAcc(AItemWeapon* Weapon, bool bIsRemove, AItemWeaponAcc* AccObj, EWeaponAccType AccType);
+
 
 
 };

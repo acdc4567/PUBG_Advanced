@@ -115,6 +115,10 @@ void APUBGA_Character::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	
+
+
+
 }
 
 // Called to bind functionality to input
@@ -158,7 +162,7 @@ void APUBGA_Character::InitSkeletalMesh() {
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::KeepRelative, true);
 	SKM_Hair->AttachToComponent(GetMesh(), AttachmentRules, FName(TEXT("Head")));
 
-	ReplaceSkeletalMesh(EFashionType::EFT_ClothBottom,"0");
+	ReplaceSkeletalMesh(EFashionType::EFT_ClothBottom,"9");
 
 }
 
@@ -244,7 +248,10 @@ void APUBGA_Character::ReplaceSkeletalMesh(EFashionType FashionType, FName Namex
 USkeletalMesh* APUBGA_Character::GetFashionDatas(FName ID) {
 	FSTR_ItemFashion* ItemFashionRow = nullptr;
 	USkeletalMesh* DataSkeletalMesh=nullptr;
-	ItemFashionRow = ItemFashionTableObject->FindRow<FSTR_ItemFashion>(ID, TEXT(""));
+	if (ID != " " || ID != "") {
+		ItemFashionRow = ItemFashionTableObject->FindRow<FSTR_ItemFashion>(ID, TEXT(""));
+
+	}
 	if (ItemFashionRow) {
 		DataSkeletalMesh = ItemFashionRow->SkeletalMesh;
 		
@@ -260,7 +267,11 @@ USkeletalMesh* APUBGA_Character::GetFashionDatas(FName ID) {
 UTexture* APUBGA_Character::GetFashionDatasTexture(FName ID) {
 	FSTR_ItemFashion* ItemFashionRow = nullptr;
 	UTexture* DataTexture = nullptr;
-	ItemFashionRow = ItemFashionTableObject->FindRow<FSTR_ItemFashion>(ID, TEXT(""));
+
+	if (ID != " " || ID != "") {
+		ItemFashionRow = ItemFashionTableObject->FindRow<FSTR_ItemFashion>(ID, TEXT(""));
+
+	}
 	if (ItemFashionRow) {
 		DataTexture = ItemFashionRow->MaskTexture;
 

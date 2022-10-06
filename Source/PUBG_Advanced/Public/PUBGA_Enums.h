@@ -78,6 +78,10 @@ enum class EInventoryLocationx : uint8 {
 	EIL_ClothesTop UMETA(DisplayName = "ClothesTop"),
 	EIL_ClothesBottom UMETA(DisplayName = "ClothesBottom"),
 	EIL_Shoes UMETA(DisplayName = "Shoes"),
+	EIL_VicinityList UMETA(DisplayName = "VicinityList"),
+	EIL_BackpackList UMETA(DisplayName = "BackpackList"),
+	EIL_Weapon UMETA(DisplayName = "Weapon"),
+	EIL_WeaponAcc UMETA(DisplayName = "WeaponAcc"),
 
 	EIL_MAX UMETA(DisplayName = "DefaultMAX")
 };

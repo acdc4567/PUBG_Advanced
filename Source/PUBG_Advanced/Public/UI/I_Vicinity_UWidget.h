@@ -37,6 +37,10 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 		UScrollBox* GoodsItemList;
 
+	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
+
+
+
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = PlayerControllers)
 		APUBGA_PlayerController* PlayerControllerRef;

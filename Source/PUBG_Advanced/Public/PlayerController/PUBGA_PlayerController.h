@@ -297,19 +297,17 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = GameMode)
 		AItemWeapon* ReadyEquipWeapon;
 
-	UFUNCTION(BlueprintCallable)
-		bool PickupGoods(APickUpBase* PUItem);
+	
 
-	UFUNCTION(BlueprintCallable)
-		void DiscardItem(AItemBase* IBItem);
+	
 
 	bool DiscardEquipment(AItemBase* IBItem, bool bIsCheck);
 
-	bool PickupEquipment(AItemBase* IBItem);
+	
 
 	void DiscardFashion(AItemBase* IBItem);
 
-	void PickupFashion(APickUpBase* PUItem);
+	
 
 	UFUNCTION(BlueprintCallable)
 		bool EquipAccessories(AItemBase* IBItemBase,bool bIsFromGround,AItemWeapon* IWeapon);
@@ -469,7 +467,16 @@ public:
 
 	FORCEINLINE float GetRightPressedTime() const { return RightPressedTime; }
 
+	bool PickupEquipment(AItemBase* IBItem);
 
+
+	UFUNCTION(BlueprintCallable)
+		bool PickupGoods(APickUpBase* PUItem);
+
+	UFUNCTION(BlueprintCallable)
+		void DiscardItem(AItemBase* IBItem);
+
+	void PickupFashion(APickUpBase* PUItem);
 
 
 };

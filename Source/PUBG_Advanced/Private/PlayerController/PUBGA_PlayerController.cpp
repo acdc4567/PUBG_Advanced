@@ -1800,7 +1800,7 @@ void APUBGA_PlayerController::DiscardItem(AItemBase* IBItem) {
 	APickUpBase* PUItem = nullptr;
 	PUItem	=SpawnPickupItems(IBItem);
 	if (IBItem->ItemType==EItemType::EIT_Ammo) {
-		PlayerStateRef->UpdateAmmoAmount(PUItem->ID,0,0);
+		PlayerStateRef->UpdateAmmoAmount(PUItem->ID,0,0,1);
 	}
 	bool bRemoved=PlayerStateRef->RemoveItem(IBItem);
 	if (IBItem) {
