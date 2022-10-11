@@ -18,7 +18,28 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Movement)
 		TSubclassOf<UUserWidget> PlayerHUDWidgetClass;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Movement)
+		TSubclassOf<UUserWidget> ActionTipsWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Movement)
+		TSubclassOf<UUserWidget> UserInfoWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Movement)
+		TSubclassOf<UUserWidget> DirectionUIWidgetClass;
+
 	virtual void BeginPlay() override;
+
+	UUserWidget* ActionTipsHUDWidget;
+
+	UUserWidget* UserInfoHUDWidget;
+
+	UUserWidget* DirectionUIHUDWidget;
+
+public:
+	void ShowActionTips(FName Info);
+
+	void HideActionTips();
+
 
 
 

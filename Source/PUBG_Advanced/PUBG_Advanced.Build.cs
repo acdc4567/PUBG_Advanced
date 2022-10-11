@@ -20,7 +20,8 @@ public class PUBG_Advanced : ModuleRules
         "PUBG_Advanced/Public/Animation",
         "PUBG_Advanced/Public/Animation/Notifies",
         "PUBG_Advanced/Public/Items",
-        "PUBG_Advanced/Public/Bullets"
+        "PUBG_Advanced/Public/Bullets",
+        "PUBG_Advanced/Public/UI/MainUI",
         });
 	
 	}

@@ -24,7 +24,11 @@ APUBGA_Characterx::APUBGA_Characterx()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>("FollowCamera");
 	FollowCamera->SetupAttachment(CameraBoom);
 
+	BowStrap = CreateDefaultSubobject<USceneComponent>("BowStrap");
+	BowStrap->SetupAttachment(GetRootComponent());
 
+	Quiver = CreateDefaultSubobject<UStaticMeshComponent>("Quiver");
+	Quiver->SetupAttachment(BowStrap);
 
 
 }

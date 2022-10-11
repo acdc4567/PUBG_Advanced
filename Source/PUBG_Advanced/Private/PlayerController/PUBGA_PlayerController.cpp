@@ -30,6 +30,7 @@
 #include "UI/Inventory_UserWidget.h"
 #include "UI/I_Vicinity_UserWidget.h"
 #include "UI/Inventory_User_Widget.h"
+#include "UI/PUBGA_HUD.h"
 
 
 
@@ -991,6 +992,12 @@ void APUBGA_PlayerController::TargetingItem() {
 		FHitResult HitResult;
 		GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility, CollisionParams);
 		
+		MyHUDx = Cast<APUBGA_HUD>(GetHUD());
+		if (MyHUDx) {
+			MyHUDx->HideActionTips();
+		}
+
+
 		for (APickUpBase* ItemInRange : ItemsInRange) {
 			ItemInRange->EnableOutline(0);
 			double TempDist = FVector::Distance(HitResult.Location, ItemInRange->GetActorLocation());
@@ -1006,6 +1013,16 @@ void APUBGA_PlayerController::TargetingItem() {
 			if (ShortestDistance<65.f) {
 				ShortestItem->EnableOutline(1);
 				ReadyPickupItem = ShortestItem;
+
+				MyHUDx = Cast<APUBGA_HUD>(GetHUD());
+				if (MyHUDx) {
+					FString TempString = ReadyPickupItem->UI_Prefix.ToString();
+					FString TempNameStr = ReadyPickupItem->Name.ToString();
+					TempString.Append(TempNameStr);
+
+					MyHUDx->ShowActionTips(FName(*TempString));
+
+				}
 			}
 			else {
 				ReadyPickupItem = nullptr;

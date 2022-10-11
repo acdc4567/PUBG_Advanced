@@ -18,6 +18,7 @@ class AItemWeapon;
 class UInventory_UserWidget;
 class UI_Vicinity_UserWidget;
 class UInventory_User_Widget;
+class APUBGA_HUD;
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemsInRangeChangeSignature, bool, bIsOnHand);
@@ -347,6 +348,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = UserInterfaces)
 		UInventory_UserWidget* InventoryUI;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = UserInterfaces)
+		APUBGA_HUD* MyHUDx;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = UserInterfaces)
 		TSubclassOf<UInventory_UserWidget> PlayerInventoryWidgetClass;
@@ -468,6 +471,9 @@ public:
 	FORCEINLINE float GetRightPressedTime() const { return RightPressedTime; }
 
 	bool PickupEquipment(AItemBase* IBItem);
+
+	FORCEINLINE bool GetIsRunPressed() const { return bRunPressed; }
+
 
 
 	UFUNCTION(BlueprintCallable)

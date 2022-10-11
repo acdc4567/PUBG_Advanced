@@ -32,6 +32,12 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Components)
 		USpringArmComponent* CameraBoom;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Components)
+		USceneComponent* BowStrap;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Components)
+		UStaticMeshComponent* Quiver;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = CharacterState)
 		bool bIsDead = 0;
 

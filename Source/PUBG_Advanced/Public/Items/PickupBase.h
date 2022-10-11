@@ -31,6 +31,9 @@ public:
 
 	FORCEINLINE UBoxComponent* GetBox() const { return Box; }
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
+		FName UI_Prefix;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -47,8 +50,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
 		UBoxComponent* Box;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Protecteds)
-		FName UI_Prefix;
+	
 
 	void InitPickup(EItemType ItemTypex, FName Namex, FName UI_Prefix1, UStaticMesh* StaticMeshx);
 
