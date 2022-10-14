@@ -65,7 +65,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = OnTheAir)
 		float ForwardValue = 0.f;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Animation)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Animation)
 		bool bIsPlayingMontage = 0;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Animation)
